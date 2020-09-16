@@ -1,0 +1,6 @@
+iminuit
+numpy
+tensorflow>=2.0
+amplitf
+matplotlib
+uproot

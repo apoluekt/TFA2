@@ -1,0 +1,11 @@
+name: x2dd
+channels: 
+  - conda-forge
+dependencies:
+  - tensorflow-gpu=2.1
+  - sympy
+  - numpy
+  - pandas
+  - iminuit
+  - uproot
+  - matplotlib 
