@@ -16,6 +16,7 @@ def set_lhcb_style(grid = True, size = 10, usetex = "auto", font = "serif") :
     Set matplotlib plotting style close to "official" LHCb style
     (serif fonts, tick sizes and location, etc.)
   """
+  os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
   if usetex == "auto" : 
     plt.rc('text', usetex=os.path.isfile("/usr/bin/latex"))
   else : 

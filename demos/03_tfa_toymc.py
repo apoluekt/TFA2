@@ -1,9 +1,8 @@
-import tensorflow as tf
-
 # Add AmpliTF and TFA2 to python module search path
-import sys
-sys.path.append("../../AmpliTF/")
-sys.path.append("../../TFA2/")
+# Not needed if properly installing TFA2 and AmpliTF with setup.py
+#import sys
+#sys.path.append("../../AmpliTF/")
+#sys.path.append("../../TFA2/")
 
 # Import AmpliTF modules
 import amplitf.interface as atfi
@@ -34,8 +33,8 @@ toy_sample = tft.run_toymc(model, phsp, npoints, maximum = 1.e-20, chunk = 10000
 
 # Plot results
 import matplotlib.pyplot as plt
-tfp.set_lhcb_style(size = 12)   # Adjust plotting style for LHCb papers
-fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (3, 3) )  # Single subplot on the figure
+tfp.set_lhcb_style(size = 12, usetex = False)   # Adjust plotting style for LHCb papers
+fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (4, 3) )  # Single subplot on the figure
 
 # Plot 1D histogram from the toy MC sample
 tfp.plot_distr1d(toy_sample[:,0], bins = 100, range = (0., 1500.), ax = ax, label = r"$m(\pi\pi)$", units = "MeV")
