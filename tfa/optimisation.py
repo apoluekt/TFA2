@@ -122,7 +122,7 @@ def run_minuit(nll, pars, use_gradient = True) :
         for i,p in enumerate(float_pars) : p.update(par[i])
         kwargs = { p.name : p() for p in float_pars + fixed_pars }
         func.n += 1
-        nll_val = nll(kwargs)
+        nll_val = nll(kwargs).numpy()
         if func.n % 10 == 0 : print(func.n, nll_val, par)
         return nll_val
 
@@ -189,7 +189,7 @@ def calculate_fit_fractions(pdf, norm_sample) :
       default_dict = dict(zip(args[-len(defaults):], defaults))
       if "switches" in default_dict : num_switches = len(default_dict["switches"])
 
-    @atfi.function
+    @tf.function
     def pdf_components(d) : 
         result = []
         for i in range(num_switches) : 
@@ -199,7 +199,7 @@ def calculate_fit_fractions(pdf, norm_sample) :
         return result
 
     total_int = atfi.reduce_sum(pdf(norm_sample))
-    return [ atfi.reduce_sum(i)/total_int for i in pdf_components(norm_sample) ]
+    return [ (atfi.reduce_sum(i)/total_int).numpy() for i in pdf_components(norm_sample) ]
 
 def write_fit_results(pars, results, filename) :
     """

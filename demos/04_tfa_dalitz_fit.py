@@ -11,12 +11,12 @@ import tfa.optimisation as tfo
 ntoys = 100000   # Number of points to generate 
 nnorm = 1000000  # Number of normalisation points
 
-mk  = 0.498
-mpi = 0.139
-md  = 1.8646
+mk  = atfi.const(0.498)
+mpi = atfi.const(0.139)
+md  = atfi.const(1.8646)
 
-dd = 5.0
-dr = 1.5
+dd = atfi.const(5.0)
+dr = atfi.const(1.5)
 
 phsp = DalitzPhaseSpace(mpi, mk, mpi, md)
 
@@ -44,7 +44,7 @@ def model(x, mrho, wrho, mkst, wkst, a1r, a1i, a2r, a2i, a3r, a3i, switches) :
     if switches[2] : 
       ampl += a3*atfd.breit_wigner_lineshape(m2ac, mrho,  wrho,  mpi, mpi, mk, md, dr, dd, 1, 1)*atfd.helicity_amplitude(hel_ac, 1)
     if switches[3] : 
-      ampl += atfi.complex(atfi.const(5.), atfi.const(0.))
+      ampl += atfi.cast_complex(atfi.ones(m2ab))*atfi.complex(atfi.const(5.), atfi.const(0.))
 
     return atfd.density( ampl )
 
@@ -61,7 +61,7 @@ def toymc_model(x, switches = 4*[1]) :
 def fit_model(x, pars) : 
   return model(x, **pars, switches = 4*[1])
 
-toy_sample = tft.run_toymc(toymc_model, phsp, ntoys, maximum = 1.e-20, chunk = 1000000, components = False).numpy()
+toy_sample = tft.run_toymc(toymc_model, phsp, ntoys, maximum = 1.e-20, chunk = 1000000, components = False)
 
 print(toy_sample)
 
@@ -80,7 +80,7 @@ tfp.plot_distr2d(toy_sample[:,0], toy_sample[:,1], bins = (50, 50),
 plt.tight_layout(pad=1., w_pad=1., h_pad=1.)
 plt.show()
 
-norm_sample = phsp.uniform_sample(nnorm).numpy()
+norm_sample = phsp.uniform_sample(nnorm)
 
 print(norm_sample)
 

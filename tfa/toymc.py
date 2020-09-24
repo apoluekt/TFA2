@@ -62,7 +62,7 @@ def run_toymc(pdf, phsp, size, maximum, chunk=200000, seed=None, components = Tr
     def condition(length, size, nchunk):
         return length < size or nchunk < -size
 
-    @atfi.function
+    @tf.function
     def pdf_vals(chunk, curr_maximum) : 
         d = accept_reject_sample(pdf, phsp.filter(phsp.unfiltered_sample(chunk, curr_maximum)))
         return d, pdf(d)
@@ -73,7 +73,7 @@ def run_toymc(pdf, phsp, size, maximum, chunk=200000, seed=None, components = Tr
       default_dict = dict(zip(args[-len(defaults):], defaults))
       if "switches" in default_dict : num_switches = len(default_dict["switches"])
 
-    @atfi.function
+    @tf.function
     def pdf_components(d) : 
         result = []
         for i in range(num_switches) : 

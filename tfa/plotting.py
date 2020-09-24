@@ -74,7 +74,7 @@ def plot_distr2d(xarr, yarr, bins, ranges, fig, ax, labels, cmap = "YlOrBr",
   #print(xarr.shape, yarr.shape, bins)
   #print("hist2d start")
   def fasthist2d(xvals, yvals, bins, ranges, weights) : 
-    vals = (xvals, yvals)
+    vals = (np.array(xvals), np.array(yvals))
     cuts = (vals[0]>=ranges[0][0]) & (vals[0]<ranges[0][1]) & (vals[1]>=ranges[1][0]) & (vals[1]<ranges[1][1])
     c = ((vals[0][cuts] - ranges[0][0]) / (ranges[0][1] - ranges[0][0]) * bins[0]).astype(np.int_)
     c += bins[0]*((vals[1][cuts] - ranges[1][0]) / (ranges[1][1] - ranges[1][0]) * bins[1]).astype(np.int_)
