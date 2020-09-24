@@ -2,7 +2,7 @@ name: tfa
 channels: 
   - conda-forge
 dependencies:
-  - python=3.6
+  - python=3.7
   - tensorflow-gpu=2.2
   - sympy
   - numpy
