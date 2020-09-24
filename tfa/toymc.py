@@ -40,6 +40,72 @@ def maximum_estimator(density, phsp, size):
     sample = phsp.uniform_sample(size)
     return tf.reduce_max(density(sample))
 
+def run_toymc(pdf, phsp, size, maximum, chunk=200000, seed=None, components = True):
+    """
+      Create toy MC sample. To save memory, the sample is generated in "chunks" of a fixed size 
+             pdf : Function returning PDF graph for a given sample as an agrument
+            phsp : phase space
+            size : size of the target data sample (if >0) or number of chunks (if <0)
+         maximum : maximum PDF value for accept-reject method
+           chunk : chunk size
+            seed : initial random seed. Not initalised if None
+    """
+    import inspect
+    length, nchunk, curr_maximum = 0, 0, maximum
+    dim = phsp.dimensionality()
+    data = tf.Variable(np.empty((0, dim)), shape=(None, dim), dtype = atfi.fptype())
+    #data = None
+
+    if seed is not None : 
+        atfi.set_seed(seed)
+
+    def condition(length, size, nchunk):
+        return length < size or nchunk < -size
+
+    @atfi.function
+    def pdf_vals(chunk, curr_maximum) : 
+        d = accept_reject_sample(pdf, phsp.filter(phsp.unfiltered_sample(chunk, curr_maximum)))
+        return d, pdf(d)
+
+    args, varargs, keywords, defaults = inspect.getargspec(pdf)
+    num_switches = 0
+    if defaults : 
+      default_dict = dict(zip(args[-len(defaults):], defaults))
+      if "switches" in default_dict : num_switches = len(default_dict["switches"])
+
+    @atfi.function
+    def pdf_components(d) : 
+        result = []
+        for i in range(num_switches) : 
+            switches = num_switches*[ 0 ]
+            switches[i] = 1
+            result += [ pdf(d, switches = tuple(switches) ) ]
+        return result
+
+    while condition(length, size, nchunk):
+        d,v = pdf_vals(chunk, curr_maximum)
+        over_maximum = v[v > curr_maximum]
+        if len(over_maximum) > 0:
+            new_maximum = atfi.reduce_max(over_maximum)*1.5
+            print(f'  Updating maximum: {curr_maximum} -> {new_maximum}. Starting over.')
+            length, nchunk, curr_maximum = 0, 0, new_maximum
+            data = tf.Variable(np.empty((0, dim)), shape=(None, dim), dtype = atfi.fptype())
+            #data = None
+            continue
+        if components and num_switches > 0 : 
+            vs = pdf_components(d)
+            wd = tf.stack([i/v for i in vs], axis=1)
+            d = tf.concat([d, wd], axis=1)
+        #if data is not None : 
+        data = tf.concat([data, d], axis=0)
+        #else : 
+        #    data = d
+        length += len(d)
+        nchunk += 1
+        print(f'  Chunk {nchunk}, size={len(d)}, total length={length}')
+    return data[:size] if size > 0 else data
+
+'''
 def run_toymc(pdf, phsp, size, maximum, chunk=200000, seed=None):
     """
       Create toy MC sample. To save memory, the sample is generated in "chunks" of a fixed size 
@@ -80,3 +146,4 @@ def run_toymc(pdf, phsp, size, maximum, chunk=200000, seed=None):
         nchunk += 1
         print(f'  Chunk {nchunk}, size={len(d)}, total length={length}')
     return data[:size] if size > 0 else data
+'''

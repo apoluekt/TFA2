@@ -29,7 +29,9 @@ def model(x) :
   return bw(x[:,0], atfi.const(770.), atfi.const(150.))
 
 # Run TFA2 toy MC generation
-toy_sample = tft.run_toymc(model, phsp, npoints, maximum = 1.e-20, chunk = 1000000)
+toy_sample = tft.run_toymc(model, phsp, npoints, maximum = 1.e-20, chunk = 1000000).numpy()
+
+print(toy_sample)
 
 # Plot results
 import matplotlib.pyplot as plt
