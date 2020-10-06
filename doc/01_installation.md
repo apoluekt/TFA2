@@ -28,3 +28,13 @@ conda env create -f env.yml  # or env_gpu.yml if you have GPU
 ```
 conda activate tfa
 ```
+
+### Configure TFA2 and AmpliTF packages
+```
+cd ../AmpliTF
+python setup.py build
+python setup.py install
+cd ../TFA2
+python setup.py build
+python setup.py install
+```
