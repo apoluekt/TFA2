@@ -20,10 +20,14 @@ problems using various hardware. Given the similarity of the two fields, it seem
 
 TensorFlow can run on many architectures, including CPU, NVidia GPU (including multi-GPU configurations), calculations can be distributed to several machines over the network. 
 
-## Imperative, declarative and functioal programming
+## Imperative, declarative and functional programming
 
 Writing efficient vectorised code (in particular, using TensorFlow) requires a certain change in programming style. The library uses the so-called 
 [declarative programming](https://en.wikipedia.org/wiki/Declarative_programming) style. Instead of exactly ordering the computer _how_ to perform calculations step-by-step ([imperative programming](https://en.wikipedia.org/wiki/Imperative_programming)), the user of TensorFlow describes _what_ has to be solved in terms of specific TensorFlow building blocks, and then gives the control to the framework which will decide how to best solve the problem using available hardware. 
+
+Another concept useful to develop parallelisable programs is [functional programming](https://en.wikipedia.org/wiki/Functional_programming). Functional style, in particular, includes writing the code using _pure functions_, i.e. functions, which don't have any internal modifiable state or _side effects_, with the output that i scompletely determined by the input parameters. When combined with declarative style, this allows the computer to easily identify the dependencies between different parts of the program and decide which parts can be calculated in parallel. 
+
+While TensorFlow does not strictly follow the functional approach (e.g. there are objects like _variables_ which have internal state), the interface of TensorFlowAnalysis library is designed with the functional approach in mind, mostly because of the possible extension to ML libraries other than TensorFlow, such as JAX which has a more _functional_ interface. 
 
 ## AmpliTF library
 
