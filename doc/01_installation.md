@@ -43,6 +43,8 @@ The example scripts we will run do not need `ROOT`. They use `matplotlib` for pl
 ```
 conda install -c conda-forge root
 ```
+This will add another 2 Gb to your `conda` environment. 
+
 If you want to use `rootpy` and/or `root-numpy` as an interface between `numpy` and `ROOT`, these have to be installed with `pip`: 
 ```
 pip install --user rootpy
