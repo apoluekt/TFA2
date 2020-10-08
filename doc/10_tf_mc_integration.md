@@ -20,9 +20,9 @@ def func(x, sigma) :
    return 1. / (sigma*math.sqrt(2.*math.pi)) * tf.exp( -x**2 / (2.*sigma**2) )
 ```
 This looks like a normal Python (or numpy) function, except that it isn't. There are a couple of notable differences: 
-   * Instead of using `math` or `numpy` library functions, we are using TF building blocks (tf.exp in this case). Most of TF mathematical functions are identical or similar in syntax to `math` or `numpy` module functions, so converting code from existing python should be not too difficult. However, rather than working with floating point numbers or numpy arrays, these functions work with _TF tensors_. 
+   * Instead of using `math` or `numpy` library functions, we are using TF building blocks (`tf.exp` in this case). Most of TF mathematical functions are identical or similar in syntax to `math` or `numpy` module functions, so converting code from existing python should be not too difficult. However, rather than working with floating point numbers or numpy arrays, these functions work with _TF tensors_. 
 
-     Note that we don't need to call, e.g. tf.sqrt() to calculate square root in this example because we just need a floating-point constant. 
+     Note that we don't need to call, e.g. `tf.sqrt()` to calculate square root in this example because we just need a floating-point constant. 
 
    * Note the ```@tf.function``` in front of the function definition. It is a _decorator_, which is a pythonic way to use a function that takes a function as a parameter and returns a function as a result (remember, we are dealing with elements of _functional programming_?). Here, ```@tf.function``` is a function defined somewhere in the TF framework, that takes the function `func` we have declared here and returns a _TF dataflow graph_ corresponding to it. The graph defines _what_ the computed should do with the data, without actually doing the corresponding operations (remember, we are using _declarative style_?). The graph can then be compiled and called when necessary (e.g. when we call the `func` function with some concrete input data). 
    
