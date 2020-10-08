@@ -6,7 +6,7 @@ Again, we start with the function that defines the PDF we will use, this time, f
 
 ```python
 def bw(m, m0, gamma) : 
-  ampl = tf.complex(m0*m0 - m*m, -m0*gamma)
+  ampl = 1./tf.complex(m0*m0 - m*m, -m0*gamma)
   return tf.abs(ampl)**2
 ```
 
