@@ -39,6 +39,14 @@ x = tf.random.uniform( (npoints, ), minval = -5., maxval = 5. )
 The output of this command is a _TF tensor_ (see the output of `print(x)`). This tensor has a representation as a numpy array, which can be obtained 
 by calling `x.numpy()`. 
 
+Like in `numpy`, TF tensors are multidimensional rectangular arrays. The _shape_ of the tensor (the number of dimensions and number of elements of each dimension) in the `tf.random.uniform` function is defined by a python _tuple_ passed as the first argument. In our case, it is a tuple of one element (comma is needed to still make it a tuple rather than scalar integer), thus we create a 1D array. 
+
+TensorFlow uses the same style for indexing the multidimensional arrays as `numpy`. A few examples as a reminder: 
+   * `array[a,b]` : single element of a 2D array
+   * `array[a,:]` : 1D subarray, row `a` of a 2D array
+   * `array[:,b]` : 1D subarray, column `b` of a 2D array
+   * `array[a1:a2,:]` : 2D slice (rows from a1 to a2) of a 2D array
+
 ## Graph tracing and retracing
 
 > __Exercise__: Try using `sigma` instead of `tf.constant(sigma)`. 
