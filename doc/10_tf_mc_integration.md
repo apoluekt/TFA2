@@ -20,12 +20,18 @@ This looks like a normal Python (or numpy) function, except that it isn't. There
 
      Note that we don't need to call, e.g. tf.sqrt() to calculate square root in this example because we just need a floating-point constant. 
 
-   * Note the ```@tf.function``` in front of the function definition. It is a _decorator_, which is a pythonic way to use a function that takes a function as a parameter and returns a function as a result (remember, we are dealing with elements of _functional programming_?). Here, ```@tf.function``` is a function defined somewhere in the TF framework, that takes the function `func` we have declared here and returns a TF _data flow graph_ corresponding to it. The graph defines _what_ the computed should do with the data (remember, we are using _declarative style_?), without actually doing the corresponding operations. The graph can them be compiled and called once needed (e.g. when we call the `func` function with some concrete input data). 
+   * Note the ```@tf.function``` in front of the function definition. It is a _decorator_, which is a pythonic way to use a function that takes a function as a parameter and returns a function as a result (remember, we are dealing with elements of _functional programming_?). Here, ```@tf.function``` is a function defined somewhere in the TF framework, that takes the function `func` we have declared here and returns a TF _data flow graph_ corresponding to it. The graph defines _what_ the computed should do with the data, without actually doing the corresponding operations (remember, we are using _declarative style_?). The graph can then be compiled and called when necessary (e.g. when we call the `func` function with some concrete input data). 
    
-     The behaviour when the program does not do actual calculations before it becomes necessary is called _lazy evaluation_. In principle, the same code could also work without using the `tf.function` decorator, but in this case the computer would run each operation immediately (_eager evaluation_). 
+     The behaviour when the program does not do actual calculations before it becomes necessary is called _lazy evaluation_. In principle, the same code could also work without using the `tf.function` decorator, but in this case the computer would run each operation immediately (_eager evaluation_). The difference between eager and lazy modes becomes visible when we need to run `func` multiple times. In eager mode, the TF would run compilation of the code every time the function is called, which makes it slower. In lazy mode, the graph is compiled only once, and is called multiple times without recompilation. 
      
      > __Exercise:__ Try commenting out `@tf.function` in front of `func` or `integral` defintions and see what happens. 
-     
+
+This line creates a unformly distributed random vector of length `npoints`: 
+```python
+x = tf.random.uniform( (npoints, ), minval = -5., maxval = 5. )
+```
+The output of this command is a _TF tensor_ (see the output of `print(x)`). This tensor has a representation as a numpy array, which can be obtained 
+by calling `x.numpy()`. 
 
 > __Exercise__: Try using `sigma` instead of `tf.constant(sigma)`. 
 
