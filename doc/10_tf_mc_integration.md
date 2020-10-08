@@ -45,7 +45,7 @@ TensorFlow uses the same style for indexing the multidimensional arrays as `nump
    * `array[a,b]` : single element of a 2D array
    * `array[a,:]` : 1D subarray, row `a` of a 2D array
    * `array[:,b]` : 1D subarray, column `b` of a 2D array
-   * `array[a1:a2,:]` : 2D slice (rows from a1 to a2) of a 2D array
+   * `array[a1:a2,:]` : 2D slice (rows from `a1` to `a2`) of a 2D array
 
 ## Graph tracing and retracing
 
