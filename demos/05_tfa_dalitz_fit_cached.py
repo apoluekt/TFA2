@@ -45,7 +45,7 @@ def model(x) :
     a2 = atfi.complex(a2r, a2i)
     a3 = atfi.complex(a3r, a3i)
 
-    ampl = atfi.complex(atfi.const(0.), atfi.const(0.))
+    ampl = atfi.cast_complex(atfi.ones(m2ab))*atfi.complex(atfi.const(0.), atfi.const(0.))
 
     if switches[0] : 
       ampl += a1*bw1*hel_ab
@@ -82,21 +82,6 @@ toy_sample = tft.run_toymc(toymc_model, phsp, ntoys, maximum = 1.e-20, chunk = 1
 
 print(toy_sample)
 
-# Plot results
-import matplotlib.pyplot as plt
-tfp.set_lhcb_style(size = 12, usetex = False)   # Adjust plotting style for LHCb papers
-fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (4, 3) )  # Single subplot on the figure
-
-# Plot 1D histogram from the toy MC sample
-tfp.plot_distr2d(toy_sample[:,0], toy_sample[:,1], bins = (50, 50), 
-                 ranges = ((0.3, 3.1), (0.3, 3.1)), 
-                 fig = fig, ax = ax, labels = (r"$m^2(K_S^0\pi^+)$", r"$m^2(K_S^0\pi^+)$"), 
-                 units = ("MeV$^2$", "MeV$^2$"), log = True)
-
-# Show the plot
-plt.tight_layout(pad=1., w_pad=1., h_pad=1.)
-plt.show()
-
 norm_sample = phsp.uniform_sample(nnorm)
 
 print(norm_sample)
@@ -123,3 +108,38 @@ def fitted_model(x, switches = 4*[1]) :
 
 ff = tfo.calculate_fit_fractions(fitted_model, norm_sample)
 print(ff)
+
+fitted_sample = tft.run_toymc(fitted_model, phsp, nnorm, maximum = 1.e-20, chunk = 1000000, components = True)
+
+# Plot results
+import matplotlib.pyplot as plt
+tfp.set_lhcb_style(size = 12, usetex = False)   # Adjust plotting style for LHCb papers
+fig, ax = plt.subplots(nrows = 2, ncols = 2, figsize = (8, 6) )  # Single subplot on the figure
+
+# Plot 1D histogram from the toy MC sample
+tfp.plot_distr2d(toy_sample[:,0], toy_sample[:,1], bins = (50, 50), 
+                 ranges = ((0.3, 3.1), (0.3, 3.1)), 
+                 fig = fig, ax = ax[0,0], labels = (r"$m^2(K_S^0\pi^+)$", r"$m^2(K_S^0\pi^-)$"), 
+                 units = ("MeV$^2$", "MeV$^2$"), log = True)
+
+tfp.plot_distr1d_comparison(toy_sample[:,0], fitted_sample[:,0], 
+                 cweights = [ fitted_sample[:,2+i] for i in range(4) ], 
+                 bins = 50, range = (0.3, 3.1), 
+                 ax = ax[0,1], label = r"$m^2(K_S^0\pi^+)$", 
+                 units = "MeV$^2$")
+
+tfp.plot_distr1d_comparison(toy_sample[:,1], fitted_sample[:,1], 
+                 cweights = [ fitted_sample[:,2+i] for i in range(4) ], 
+                 bins = 50, range = (0.3, 3.1), 
+                 ax = ax[1,0], label = r"$m^2(K_S^0\pi^-)$", 
+                 units = "MeV$^2$")
+
+tfp.plot_distr1d_comparison(phsp.m2ac(toy_sample), phsp.m2ac(fitted_sample), 
+                 cweights = [ fitted_sample[:,2+i] for i in range(4) ], 
+                 bins = 50, range = (0.3, 2.1), 
+                 ax = ax[1,1], label = r"$m^2(\pi^+\pi^-)$", 
+                 units = "MeV$^2$")
+
+# Show the plot
+plt.tight_layout(pad=1., w_pad=1., h_pad=1.)
+plt.show()

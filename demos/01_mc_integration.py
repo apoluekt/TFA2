@@ -1,3 +1,5 @@
+# An example of MC integration of a 1D Gaussian distribution using pure TensorFlow v2. 
+
 import math
 import tensorflow as tf
 from timeit import default_timer as timer

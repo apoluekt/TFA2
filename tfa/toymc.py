@@ -52,9 +52,6 @@ def run_toymc(pdf, phsp, size, maximum, chunk=200000, seed=None, components = Tr
     """
     import inspect
     length, nchunk, curr_maximum = 0, 0, maximum
-    dim = phsp.dimensionality()
-    data = tf.Variable(np.empty((0, dim)), shape=(None, dim), dtype = atfi.fptype())
-    #data = None
 
     if seed is not None : 
         atfi.set_seed(seed)
@@ -73,7 +70,11 @@ def run_toymc(pdf, phsp, size, maximum, chunk=200000, seed=None, components = Tr
       default_dict = dict(zip(args[-len(defaults):], defaults))
       if "switches" in default_dict : num_switches = len(default_dict["switches"])
 
-    @tf.function
+    #dim = phsp.dimensionality()
+    #data = tf.Variable(np.empty((0, dim)), shape=(None, dim), dtype = atfi.fptype())
+    data = None
+
+    #@tf.function
     def pdf_components(d) : 
         result = []
         for i in range(num_switches) : 
@@ -89,17 +90,17 @@ def run_toymc(pdf, phsp, size, maximum, chunk=200000, seed=None, components = Tr
             new_maximum = atfi.reduce_max(over_maximum)*1.5
             print(f'  Updating maximum: {curr_maximum} -> {new_maximum}. Starting over.')
             length, nchunk, curr_maximum = 0, 0, new_maximum
-            data = tf.Variable(np.empty((0, dim)), shape=(None, dim), dtype = atfi.fptype())
-            #data = None
+            #data = tf.Variable(np.empty((0, dim)), shape=(None, dim), dtype = atfi.fptype())
+            data = None
             continue
         if components and num_switches > 0 : 
             vs = pdf_components(d)
             wd = tf.stack([i/v for i in vs], axis=1)
             d = tf.concat([d, wd], axis=1)
-        #if data is not None : 
-        data = tf.concat([data, d], axis=0)
-        #else : 
-        #    data = d
+        if data is not None : 
+            data = tf.concat([data, d], axis=0)
+        else : 
+            data = d
         length += len(d)
         nchunk += 1
         print(f'  Chunk {nchunk}, size={len(d)}, total length={length}')
