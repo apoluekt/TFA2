@@ -28,7 +28,7 @@ This looks like a normal Python (or `numpy`) function, except that it isn't. The
    
      The behaviour when the program does not do actual calculations before it becomes necessary is called __lazy evaluation__. In principle, the same code could also work without using the `tf.function` decorator, but in this case the computer would run each operation immediately (__eager evaluation__). The difference between eager and lazy modes becomes visible when we need to run `func` multiple times. In eager mode, the TF would run compilation of the code every time the function is called, which makes it slower. In lazy mode, the graph is compiled only once, and is called multiple times without recompilation. 
      
-     > __Exercise:__ Note the difference in the execution time for the first and the subsequent calls of the `integral` function. Try commenting out `@tf.function` in front of `func` or `integral` defintions and see what happens. 
+> __Exercise:__ Note the difference in the execution time for the first and the subsequent calls of the `integral` function. Try commenting out `@tf.function` in front of `func` or `integral` defintions and see what happens. 
 
 ## TF tensors, shapes, indexing
 
@@ -49,5 +49,9 @@ TensorFlow uses the same style for indexing the multidimensional arrays as `nump
 
 ## Graph tracing and retracing
 
+The process of converting a Python function into TF graph is called __tracing__. If the function is only called with TF tensors as arguments, the tracing will be done only once when the TF needs to run a function (unless we are running TF in eager mode). However, the function can have additional arguments that are not TF tensors (like `sigma`) in our example above. In that case, if the function is called multuple times with different values of non-tensor parameters, TF will build the new graph for each call (__retracing__). This can be avoided by ensuring that the function always receives only tensors. The scalar parameters can be converted into TF tensors with `tf.constant()` function as we do here: 
+```python
+y = integral(func(x, tf.constant(sigma) ))
+```
 > __Exercise__: Try using `sigma` instead of `tf.constant(sigma)`. 
 
