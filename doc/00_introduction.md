@@ -4,7 +4,7 @@ Modern physics analyses in HEP, and in flavour physics in particular, are often 
 
 ## Vectorised calculations in HEP
 
-Calculations typically performed in HEP analyses mostly have statistical nature, _e.g._, instead of dealing with each even individually, we perform bulk claculations on a large dataset as a whole. As a result, most of the claculations can be efficiently __vectorised__ (one can apply the same function element-wise on the full dataset). Typical use cases, such as maximum likelihood fits and parameter scans, Monte-Carlo techniques, etc., all fall in this category. Vectorised code can then run on different architectures where hardware parallelisation is available, such as multicore/multithreaded CPU, graphical processors (GPU), tensor units or even FPGAs. 
+Calculations typically performed in HEP analyses mostly have statistical nature, _e.g._, instead of dealing with each event individually, we perform bulk claculations on a large dataset as a whole. As a result, most of the claculations can be efficiently __vectorised__ (one can apply the same function element-wise on the full dataset). Typical use cases, such as maximum likelihood fits and parameter scans, Monte-Carlo techniques, etc., all fall in this category. Vectorised code can then run on different architectures where hardware parallelisation is available, such as multicore/multithreaded CPU, graphical processors (GPU), tensor units or even FPGAs. 
 
 ## Machine learning frameworks
 
