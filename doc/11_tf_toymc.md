@@ -29,3 +29,7 @@ TF supports the same syntax for [__fancy indexing__](https://numpy.org/doc/stabl
 ```python
 mgen = m[r<y]
 ```
+Equivalently, this could be reached using the Boolean operations `tf.less()` and `tf.boolean_mask()`: 
+```python
+mgen = tf.boolean_mask(m, tf.less(r, y) )
+```
