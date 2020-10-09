@@ -2,7 +2,7 @@
 
 Example available here: https://github.com/apoluekt/TFA2/blob/master/demos/02_tf_toymc.py
 
-Again, we start with the function that defines the PDF we will use, this time, for MC generation using [__rejection sampling__](https://en.wikipedia.org/wiki/Rejection_sampling): 
+<img src="https://miro.medium.com/max/784/1*CmlQbGdECPyfM5vZeEkHUg.png" width="300" align="right"> Again, we start with the function that defines the PDF we will use, this time, for MC generation using [__rejection sampling__](https://en.wikipedia.org/wiki/Rejection_sampling)
 
 ```python
 def bw(m, m0, gamma) : 
