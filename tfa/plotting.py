@@ -291,7 +291,7 @@ class MultidimDisplay :
           ax1 = axes[2*(n // self.dim) + 1, n % self.dim]
         plot_distr2d(data[:,i], data[:,j], bins = (bins[i], bins[j]), 
                    ranges = (ranges[i], ranges[j]), fig = fig, ax = ax1, 
-                   labels = (labels[i], labels[j]), cmap = cmap )
+                   labels = (labels[i], labels[j]), cmap = cmap, title = "Data" )
         n += 1
 
   def draw(self, weights) : 
@@ -318,7 +318,7 @@ class MultidimDisplay :
         plot_distr2d(self.norm[:,i], self.norm[:,j], bins = (self.bins[i], self.bins[j]), 
                      ranges = (self.ranges[i], self.ranges[j]), fig = self.fig, ax = ax2, 
                      labels = (self.labels[i], self.labels[j]), cmap = self.cmap, 
-                     weights = scale*weights, colorbar = self.first )
+                     weights = scale*weights, colorbar = self.first, title = "Fit" )
         n += 1
 
     self.first = False
