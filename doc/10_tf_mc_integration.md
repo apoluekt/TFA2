@@ -20,7 +20,7 @@ def func(x, sigma) :
    return 1. / (sigma*math.sqrt(2.*math.pi)) * tf.exp( -x**2 / (2.*sigma**2) )
 ```
 This looks like a normal Python (or `numpy`) function, except that it isn't. There are a couple of notable differences: 
-   * Instead of using `math` or `numpy` library functions, we are using TF building blocks (`tf.exp` in this case). Most of TF mathematical functions are identical or similar in syntax to `math` or `numpy` module functions, so converting code from existing python should be not too difficult. Line in `numpy`, these functions are __vectorised__, _i.e._ when called with an array as an argument, they will be applied to each element of the array. However, rather than working with floating point numbers or numpy arrays, these functions work with __TF tensors__. 
+   * Instead of using `math` or `numpy` library functions, we are using TF building blocks (`tf.exp` in this case). Most of [TF mathematical functions](https://www.tensorflow.org/api_docs/python/tf/math) are identical or similar in syntax to `math` or `numpy` module functions, so converting code from existing python should be not too difficult. Line in `numpy`, these functions are __vectorised__, _i.e._ when called with an array as an argument, they will be applied to each element of the array. However, rather than working with floating point numbers or numpy arrays, these functions work with __TF tensors__. 
 
      Note that we don't need to call, e.g. `tf.sqrt()` to calculate square root in this example because we just need a floating-point constant. 
 
