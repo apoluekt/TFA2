@@ -12,11 +12,11 @@ run on different architectures where hardware parallelisation is available, such
 The kinds of problems that are typically solved in HEP analyses resemble very much those seen in machine learning (ML). For instance, in a typical maximum likelihood fit, one minimises a certain figure of merit (negative log likelihood), which can be a rather complex function (theoretical model) calculated on a given (often large) data set, against a number of tunable parameters. This is pretty similar to a typical machine learning task, where the figure of merit is called "cost function" that is calculated on a training data set, and the fitted model is expressed as an artificial neural network with optimisable parameters. 
 
 Machine learning community (which is admittedly much broader than that of HEP) has developed a number of computational frameworks to efficiently deal with their 
-problems using various hardware. Given the similarity of the two fields, it seems logical to try to reuse ML products for HEP analyses. There is a number of ML frameworks currently on the market, but not all of them fit sufficitntly to for physics calculations. The best match for the moment seems to be the TensorFlow library by Google. Its features that are critical for HEP are as follows: 
+problems using various hardware. Given the similarity of the two fields, it seems logical to try to reuse ML products for HEP analyses. There is a number of ML frameworks currently on the market, but not all of them fit sufficitntly to for physics calculations. The best match for the moment seems to be the TensorFlow library by Google. Its features that are critical for HEP are: 
 
    * Good support of complex numbers and a rich library of mathematical functions.
-   * Its support by sympy library (python library for symbolic calculations) in cases when certain math functions are not available out of the box.
-   * Broad community, open source.
+   * Support by sympy library (python library for symbolic calculations) in cases when certain math functions are not available out of the box.
+   * Large user community, open source.
 
 TensorFlow can run on many architectures, including CPU, NVidia GPU (including multi-GPU configurations), calculations can be distributed to several machines over the network. 
 
