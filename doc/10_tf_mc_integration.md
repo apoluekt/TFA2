@@ -2,7 +2,7 @@
 
 We will start with a very simple example of a script, where we will perform Monte-Carlo integration of a 1D Gaussian distribution using pure TensorFlow. The example is available here: https://github.com/apoluekt/TFA2/blob/master/demos/01_mc_integration.py
 
-The structure of the script is rather simple, but let's note a few important points. 
+We will illustrate a few important TF concepts using this example. 
 
 ## Loading TF modules
 
