@@ -49,7 +49,7 @@ TensorFlow uses the same style for indexing the multidimensional arrays as `nump
 
 ## Graph tracing and retracing
 
-The process of converting a Python function into TF graph is called __tracing__. If the function is only called with TF tensors as arguments, the tracing will be done only once when the TF needs to run a function (unless we are running TF in eager mode). However, the function can have additional arguments that are not TF tensors (like `sigma`) in our example above. In that case, if the function is called multuple times with different values of non-tensor parameters, TF will build the new graph for each call (__retracing__). This can be avoided by ensuring that the function always receives only tensors. The scalar parameters can be converted into TF tensors with `tf.constant()` function as we do here: 
+The process of converting a Python function into TF graph is called __tracing__. If the function is only called with TF tensors as arguments, the tracing will be done only once when the TF needs to run a function (unless we are running TF in eager mode). However, the function can have additional arguments that are not TF tensors (like `sigma` in our example). In that case, if the function is called multuple times with different values of non-tensor parameters, TF will build the new graph for each call (__retracing__). This can be avoided by ensuring that the function always receives only tensors. The scalar parameters can be converted into TF tensors with `tf.constant()` function as we do here: 
 ```python
 y = integral(func(x, tf.constant(sigma) ))
 ```
