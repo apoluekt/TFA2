@@ -11,24 +11,24 @@ def bw(m, m0, gamma) :
       m0    : resonance mass
       gamma : resonance width
   """
-  ampl = tf.complex(m0*m0 - m*m, -m0*gamma)
+  ampl = 1./tf.complex(m0*m0 - m*m, -m0*gamma)
   return tf.abs(ampl)**2
 
 # Set initial random seed
 tf.random.set_seed(1)
 
 # Generate random sample (1D vector) with the uniformly distributed values
-m = tf.random.uniform( (npoints, ), minval = 0., maxval = 1500. )
+m = tf.random.uniform( (npoints, ), minval = 0., maxval = 1500., dtype = tf.float64 )
 
 # Calculate the vector of 1D Breit-Wigner densities for a generated dataset
 #   Use rho0 resonance parameters
-y = bw(m, tf.constant(770.), tf.constant(150.) )
+y = bw(m, tf.constant(770., dtype = tf.float64), tf.constant(150., dtype = tf.float64) )
 
 # Calculate the maximum of the PDF 
 ymax = tf.reduce_max(y)
 
 # Generate the uniform random sample from 0 to maximum
-r = tf.random.uniform( (npoints, ), minval = 0., maxval = ymax )
+r = tf.random.uniform( (npoints, ), minval = 0., maxval = ymax, dtype = tf.float64 )
 
 # Filter only the points with the random variable less than PDF value
 mgen = m[r<y]
