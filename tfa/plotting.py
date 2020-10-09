@@ -61,18 +61,19 @@ def plot_distr2d(xarr, yarr, bins, ranges, fig, ax, labels, cmap = "YlOrBr",
                  weights = None, colorbar = True) : 
   """
     Plot 2D distribution including colorbox.
-      hist   : histogram to be plotted
-      fig    : matplotlib figure object
-      ax     : matplotlib axis object
-      labels : Axis label titles (2-element list)
-      cmap   : matplotlib colormap
-      log    : if True, use log z scale
-      ztitle : x axis title (default is "Entries")
-      title : plot title
-      units : 2-element list for x axis and y axis units
+      :param xarr:   array of x-coordinates
+      :param yarr:   array of y-coordinates
+      :param bins:   2-element tuple with number of bins in x and y axes, e.g. (50, 50)
+      :param ranges: 2-element tuple of ranges in x and y dimensions, e.g. ((0, 1), (-1, 1))
+      :param fig:    matplotlib figure object
+      :param ax:     matplotlib axis object
+      :param labels: Axis label titles (2-element tuple)
+      :param cmap:   matplotlib colormap name
+      :param log:    if True, use log z scale
+      :param ztitle: z axis title (if None, use "Entries")
+      :param title:  plot title
+      :param units:  2-element tuple of x axis and y axis units
   """
-  #print(xarr.shape, yarr.shape, bins)
-  #print("hist2d start")
   def fasthist2d(xvals, yvals, bins, ranges, weights) : 
     vals = (np.array(xvals), np.array(yvals))
     cuts = (vals[0]>=ranges[0][0]) & (vals[0]<ranges[0][1]) & (vals[1]>=ranges[1][0]) & (vals[1]<ranges[1][1])
@@ -81,10 +82,8 @@ def plot_distr2d(xarr, yarr, bins, ranges, fig, ax, labels, cmap = "YlOrBr",
     H = np.bincount(c, minlength=bins[0]*bins[1], weights = weights).reshape(bins[1], bins[0])
     return H, np.linspace(ranges[0][0], ranges[0][1], bins[0]+1), np.linspace(ranges[1][0], ranges[1][1], bins[1]+1)
 
-  #counts, xedges, yedges = np.histogram2d(xarr, yarr, bins = bins, range = ranges, weights = weights)
   counts, xedges, yedges = fasthist2d(xarr, yarr, bins = bins, ranges = ranges, weights = weights)
 
-  #print("hist2d end")
   norm = None
   if log : 
     vmax = np.max(counts)
@@ -94,11 +93,6 @@ def plot_distr2d(xarr, yarr, bins, ranges, fig, ax, labels, cmap = "YlOrBr",
     norm = matplotlib.colors.LogNorm(vmin = vmin, vmax = vmax)
 
   X, Y = np.meshgrid(xedges, yedges)
-  #print(xedges.shape)
-  #print(yedges.shape)
-  #print(X.shape)
-  #print(Y.shape)
-  #print(counts.shape)
   p = ax.pcolormesh(X, Y, counts, cmap = cmap, norm = norm, linewidth=0, rasterized=True)
   ax.set_xlabel(label_title(labels[0], units[0]), ha='right', x=1.0)
   ax.set_ylabel(label_title(labels[1], units[1]), ha='right', y=1.0)
@@ -114,13 +108,16 @@ def plot_distr2d(xarr, yarr, bins, ranges, fig, ax, labels, cmap = "YlOrBr",
 def plot_distr1d(arr, bins, range, ax, label, log = False, units = None, weights = None, 
                  title = None, color = None, legend = None, errors = False) : 
   """
-    Plot 1D histogram and its fit result. 
-      hist : histogram to be plotted
-      func : fitting function in the same format as fitting.fit_hist1d
-      pars : list of fitted parameter values (output of fitting.fit_hist2d)
-      ax   : matplotlib axis object
-      label : x axis label title
-      units : Units for x axis
+    Plot 1D histogram from the data in array.
+      :param arr:    array of x-coordinates
+      :param bins:   number of bins in x axis
+      :param range:  ranges in x dimension, e.g. (0, 1)
+      :param ax:     matplotlib axis object
+      :param label:  x-axis label title
+      :param log:    if True, use log y scale
+      :param ztitle: z axis title (if None, use "Entries")
+      :param title:  plot title
+      :param units:  2-element tuple of x axis and y axis units
   """
   if isinstance(weights, list) : 
     xarr = None
@@ -172,11 +169,6 @@ def plot_distr1d(arr, bins, range, ax, label, log = False, units = None, weights
     ax.set_title(title)
   if legend : ax.legend(loc = "best")
 
-  #ax.hist( arr, bins = bins, range = range, color = data_color, histtype = "step", weights = weights )
-  #ax.set_ylim(bottom = 0.)
-  #ax.set_xlabel(label_title(label, units), ha='right', x=1.0)
-  #ax.set_ylabel(r"Entries", ha='right', y=1.0)
-  #ax.set_title(label + r" distribution")
 
 def plot_distr1d_comparison(data, fit, bins, range, ax, label, log = False, units = None, 
                             weights = None, pull = False, cweights = None, title = None, 
