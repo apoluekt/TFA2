@@ -1,6 +1,6 @@
 # Installation 
 
-The most straightforward way to install the `TensorFlowAnalysis` and `AmpliTF` packages is using `Conda`. It will install an independent `python` environment in your home directory and will handle all the dependencies. Note that you will need plenty of space in your home for `Conda` environment (around 6 Gb). Please follow the steps below: 
+The most straightforward way to install the `TensorFlowAnalysis` and `AmpliTF` packages is using `Conda`. It will install an independent Python environment in your home directory and will handle all the dependencies. Note that you will need plenty of space in your home for `Conda` environment (around 6 Gb). Please follow the steps below: 
 
 ### Download `conda`
 ```
