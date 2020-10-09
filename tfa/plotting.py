@@ -232,9 +232,10 @@ def plot_distr1d_comparison(data, fit, bins, range, ax, label, log = False, unit
     ax.set_title(title)
   if pull : 
     xarr = np.array([left,right]).T.flatten()
-    with np.errstate(divide='ignore'):
+    with np.errstate(divide='ignore', invalid='ignore') :
       pullhist = (datahist-fithist)/np.sqrt(datahist)
       pullhist[datahist == 0] = 0
+    #pullhist = np.divide(datahist-fithist, np.sqrt(datahist), out=np.zeros_like(datahist), where=(datahist>0) )
     pullarr = np.array([pullhist,pullhist]).T.flatten()
     ax2 = ax.twinx()
     ax2.set_ylim(bottom = -10.)
