@@ -29,3 +29,10 @@ def model(x) :
 ```
 We are using the fixed resonance mass and width corresponding to rho(770) meson. Note the use of `amplitf.interface` function `atfi.const()`, which is identical to the TF function `tf.constant()`, but specifies the double precision by default. The default floating point precision, double or single, can be set for `AmpliTF` by calling the functions `atfi.set_double_precision()` and `atfi.set_single_precision()`. 
 
+Next, we use the functions from another package, `TensorFlowAnalysis`. While `AmpliTF` aims to only be limited to simple functions and objects, and tries to be decoupled as much as possible from TensorFlow (such that one could use another `numpy`-compatible backend, such as `numpy` itself of `JAX`, by only replacing the interface module), `TensorFlowAnalysis` is more tied more tightly with TensorFlow and provides the interface for toy MC generation, function minimisation using `iminuit`, plotting routines based on `matplotlib` _etc_. 
+
+In this example we use the function `run_toymc()` from `tfa.toymc` module: 
+```python
+toy_sample = tft.run_toymc(model, phsp, npoints, maximum = 1.e-20, chunk = 1000000).numpy()
+```
+
