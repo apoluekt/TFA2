@@ -47,8 +47,10 @@ def run_toymc(pdf, phsp, size, maximum, chunk=200000, seed=None, components = Tr
             phsp : phase space
             size : size of the target data sample (if >0) or number of chunks (if <0)
          maximum : maximum PDF value for accept-reject method
-           chunk : chunk size
+           chunk : size of chunk (initial number of events before rejection, generated in parallel)
             seed : initial random seed. Not initalised if None
+      components : if True, generate weights for components 
+                   (if the argument "switches" is available in pdf)
     """
     import inspect
     length, nchunk, curr_maximum = 0, 0, maximum

@@ -1,10 +1,5 @@
-
-
-# Add AmpliTF and TFA2 to python module search path
-# Not needed if properly installing TFA2 and AmpliTF with setup.py
-#import sys
-#sys.path.append("../../AmpliTF/")
-#sys.path.append("../../TFA2/")
+# Example of MC generation and plotting of a 1D Breit-Wigner distribution 
+# using TensorFlowAnalysis
 
 # Import AmpliTF modules
 import amplitf.interface as atfi

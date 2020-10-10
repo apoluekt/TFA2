@@ -80,6 +80,7 @@ def normalise(array, ranges) :
     v = [ (array[:,i]-ranges[i][0])/(ranges[i][1]-ranges[i][0]) for i in range(len(ranges)) ]
     return tf.stack(v, axis = 1)
 
+@tf.function
 def multilayer_perceptron(x, ranges, weights, biases, multiple = False):
     """
       Multilayer perceptron with fully connected layers defined by matrices of weights and biases. 
