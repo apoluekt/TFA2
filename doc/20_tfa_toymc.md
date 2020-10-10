@@ -35,4 +35,5 @@ In this example we use the function `run_toymc()` from `tfa.toymc` module:
 ```python
 toy_sample = tft.run_toymc(model, phsp, npoints, maximum = 1.e-20, chunk = 1000000).numpy()
 ```
+It takes the PDF function we have defined above, `model`, and the phase space object `phsp`, and generates the dataset of the requested size (`npoints`) using rejection sampling. Genration is done in chunks of the fixed size, specifiec with the parameter `chunk`. One chunk is processed in parallel, then, if the number of selected events is smaller than the requested amount, another chunk is generated. Rejection sampling approach needs an estimate of the maximum of the PDF, which is passed to the function as well. If the generator finds the PDF value larger than the maximum estimate, it will start the generation from scratch. Thus, if the maximum of the PDF is not known, it is safe to pass a very low value (as we do here), such that the maximum is determined automatically. 
 
