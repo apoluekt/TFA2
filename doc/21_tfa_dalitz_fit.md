@@ -47,3 +47,23 @@ We have K* and rho resonances in each of the 3 channels, Ks pi+, Ks pi- and pi+ 
    * The `atfd.breit_wigner_lineshape` we use here, unlike the `atfd.relativistic_breit_wigner()` used in the previous example, includes various corrections to the Breit-Wigner amplitude, such as Blatt-Weisskopf formfactors and mass-dependent width, thus the large number of parameters it needs. 
    
    * A rather weird construction, `atfi.cast_complex(atfi.ones(m2ab))*atfi.complex(atfi.const(5.), atfi.const(0.))` is needed to ensure that we always obtain the vector of `N` values, even if only one non-resonant component switch is turned on. Otherwise, if we used `atfi.complex(atfi.const(5.), atfi.const(0.))`, the function would return a scalar instead of vector. 
+
+The function `model` is the most generic function which is then used in the derived functions that are called by the respective parts of `TFA`. The first one of those is the model for toy MC generation, which has only one argument, the input tensor `x` (we have already used this form in the previous example): 
+```python 
+def toymc_model(x) : 
+  return model(x, switches = 4*[1], 
+               mrho = atfi.const(0.770), wrho = atfi.const(0.150), 
+               mkst = atfi.const(0.892), wkst = atfi.const(0.050), 
+               a1r = atfi.const(1.0), a1i = atfi.const(0.), 
+               a2r = atfi.const(0.5), a2i = atfi.const(0.), 
+               a3r = atfi.const(2.), a3i = atfi.const(0.))
+```
+In this function, we fix the parameters of the model to their "true" values. All the switches are set to `1` (all components are enabled). 
+
+The second derived function is the fit model: 
+```python
+@atfi.function
+def fit_model(x, pars) : 
+  return model(x, **pars, switches = 4*[1])
+```
+In addition to the input tensor `x`, it takes the second argument, the dictionary of fit parameters `pars` in the form `{'name' : value}`. Since the parameters in `model` are named, we can use Python [argument unpacking](https://www.geeksforgeeks.org/packing-and-unpacking-arguments-in-python/) syntax when calling it with `**par`. 
