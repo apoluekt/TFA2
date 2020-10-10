@@ -37,3 +37,9 @@ toy_sample = tft.run_toymc(model, phsp, npoints, maximum = 1.e-20, chunk = 10000
 ```
 It takes the PDF function we have defined above, `model`, and the phase space object `phsp`, and generates the dataset of the requested size (`npoints`) using rejection sampling. Genration is done in chunks of the fixed size, specifiec with the parameter `chunk`. One chunk is processed in parallel, then, if the number of selected events is smaller than the requested amount, another chunk is generated. Rejection sampling approach needs an estimate of the maximum of the PDF, which is passed to the function as well. If the generator finds the PDF value larger than the maximum estimate, it will start the generation from scratch. Thus, if the maximum of the PDF is not known, it is safe to pass a very low value (as we do here), such that the maximum is determined automatically. 
 
+`tfa.plotting` module contains a few useful functions to plot 1D and 2D histograms from the numpy arrays, compare several distributions, plot PDFs with components, weighted PDFs, and projections of multidimensional data. Here we are using the function `plot_distr1d` to plot the 1D histogram from the generated data: 
+```python
+tfp.plot_distr1d(toy_sample[:,0], bins = 100, range = (0., 1500.), ax = ax, label = r"$m(\pi\pi)$", units = "MeV")
+```
+The functions of `tfa.plotting` module try to mimic as much as possible LHcb publication style from ROOT (set up by calling `tfp.set_lhcb_style()` function). If LaTeX is installed, one can use `usetex=True` option to format all labels with LaTeX, which makes them prettier for publications. 
+
