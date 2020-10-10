@@ -67,3 +67,12 @@ def fit_model(x, pars) :
   return model(x, **pars, switches = 4*[1])
 ```
 In addition to the input tensor `x`, it takes the second argument, the dictionary of fit parameters `pars` in the form `{'name' : value}`. Since the parameters in `model` are named, we can use Python [argument unpacking](https://www.geeksforgeeks.org/packing-and-unpacking-arguments-in-python/) syntax when calling it with `**par`. 
+
+This function is used in the unbinned negative log likelihood function `nll`: 
+```python
+def nll(data, norm) : 
+  @atfi.function
+  def _nll(pars) : 
+    return atfl.unbinned_nll(fit_model(data, pars), atfl.integral(fit_model(norm, pars)))
+  return _nll
+```
