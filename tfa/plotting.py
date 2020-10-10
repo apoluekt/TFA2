@@ -15,6 +15,10 @@ def set_lhcb_style(grid = True, size = 10, usetex = "auto", font = "serif") :
   """
     Set matplotlib plotting style close to "official" LHCb style
     (serif fonts, tick sizes and location, etc.)
+      :param grid:   Enable grid on the plots
+      :param size:   Font size
+      :param usetex: Use LaTeX for labels
+      :param font:   Font family
   """
   os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
   if usetex == "auto" : 
@@ -79,7 +83,7 @@ def plot_distr2d(xarr, yarr, bins, ranges, fig, ax, labels, cmap = "YlOrBr",
     cuts = (vals[0]>=ranges[0][0]) & (vals[0]<ranges[0][1]) & (vals[1]>=ranges[1][0]) & (vals[1]<ranges[1][1])
     c = ((vals[0][cuts] - ranges[0][0]) / (ranges[0][1] - ranges[0][0]) * bins[0]).astype(np.int_)
     c += bins[0]*((vals[1][cuts] - ranges[1][0]) / (ranges[1][1] - ranges[1][0]) * bins[1]).astype(np.int_)
-    H = np.bincount(c, minlength=bins[0]*bins[1], weights = weights).reshape(bins[1], bins[0])
+    H = np.bincount(c, minlength=bins[0]*bins[1], weights = weights)[:bins[0]*bins[1]].reshape(bins[1], bins[0])
     return H, np.linspace(ranges[0][0], ranges[0][1], bins[0]+1), np.linspace(ranges[1][0], ranges[1][1], bins[1]+1)
 
   counts, xedges, yedges = fasthist2d(xarr, yarr, bins = bins, ranges = ranges, weights = weights)

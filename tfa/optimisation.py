@@ -142,7 +142,14 @@ def run_minuit(nll, pars, use_gradient = True) :
 def calculate_fit_fractions(pdf, norm_sample) :
     """
       Calculate fit fractions for PDF components
+        pdf : PDF function or two parameters: 
         norm_sample : normalisation sample. 
+
+      PDF should be the function of 2 parameter: 
+        pdf(x, switches = 4*[1])
+      where the 1st positional parameter is the data sample, 
+      and the named parameter "switches" should default to the 
+      list of "1". The size of the list defines the number of components.
     """
     import inspect
     args, varargs, keywords, defaults = inspect.getargspec(pdf)
@@ -166,7 +173,8 @@ def calculate_fit_fractions(pdf, norm_sample) :
 def write_fit_results(pars, results, filename) :
     """
       Write the dictionary of fit results to text file
-        results : fit results as returned by MinuitFit
+        pars     : list of FitParameter objects
+        results  : fit results as returned by MinuitFit
         filename : file name
     """
     f = open(filename, "w")
