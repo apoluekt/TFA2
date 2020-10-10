@@ -41,5 +41,5 @@ It takes the PDF function we have defined above, `model`, and the phase space ob
 ```python
 tfp.plot_distr1d(toy_sample[:,0], bins = 100, range = (0., 1500.), ax = ax, label = r"$m(\pi\pi)$", units = "MeV")
 ```
-The functions of `tfa.plotting` module try to mimic as much as possible LHcb publication style from ROOT (set up by calling `tfp.set_lhcb_style()` function). If LaTeX is installed, one can use `usetex=True` option to format all labels with LaTeX, which makes them prettier for publications. 
+The functions of `tfa.plotting` module try to mimic as much as possible LHCb publication style from ROOT (set up by calling `tfp.set_lhcb_style()` function). If LaTeX is installed, one can use `usetex=True` option to format all labels with LaTeX, which makes them prettier for publications. 
 
