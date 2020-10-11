@@ -76,3 +76,23 @@ def nll(data, norm) :
     return atfl.unbinned_nll(fit_model(data, pars), atfl.integral(fit_model(norm, pars)))
   return _nll
 ```
+which returns the function with the only argument `par` (dictionary of fit parameters) to be minimised in the call `tfo.run_minuit()`. 
+```python
+result = tfo.run_minuit(nll(toy_sample, norm_sample), pars)
+```
+Unbinned likelihood above requires an integral of the PDF, that is calculated by summing the PDF values over the uniformly distributed random sample (MC integration) `norm` created with `phsp.uniform_sample()` call. 
+
+The call to `tfo.run_minuit` needs a list of fit parameters which are defined by the object `tfo.FitParameter`
+```python
+pars = [
+  tfo.FitParameter("mrho", 0.770, 0.7, 0.9), 
+  tfo.FitParameter("wrho", 0.150, 0.05, 0.2), 
+  ...
+]
+```
+The arguments of the constructor are: parameter name (should be the same as in the definition of `func`), initial value, lower and upper limits. 
+
+`run_minuit` uses `iminuit` libraray to perform minimisation. By default, it will use the TF ability to evaluate __analytical gradient__ of the minimised function, which greatly reduces the number of steps needed for the fit to convertge, although requires more memory. The optional argument `use_gradient` controls this behaviour
+
+> __Excercise__: try adding `use_gradient = False` to the `run_minuit` call. 
+
