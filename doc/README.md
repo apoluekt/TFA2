@@ -21,3 +21,5 @@ Instructions on how to install AmpliTF and TensorFlowAnalysis using Conda enviro
 ### [Dalitz plot generation and fit](21_tfa_dalitz_fit.md)
 
 ### [Dalitz plot fit with caching](22_tfa_dalitz_fit_cached.md)
+
+### [Acceptance of Bs->Jpsi phi decay and ANNs for its parametrisation](23_tfa_acceptance_and_ann.md)
