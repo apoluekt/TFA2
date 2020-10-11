@@ -28,7 +28,7 @@ Another concept useful to develop parallelisable programs is [__functional progr
 
 While TensorFlow does not strictly follow the functional approach (e.g. there are objects like __variables__ which have internal state), the interface of `TensorFlowAnalysis` library is designed with the functional approach in mind, mostly because of the possible extension to ML libraries other than TensorFlow, such as [JAX](https://jax.readthedocs.io/en/latest/) which has a more functional interface. 
 
-## AmpliTF library
+## Libraries to use TensorFlow in flavour analyses
 
-## TFA2 library
+While TensorFlow can be used as a general computation engine, it would be useful to have a library of functions that are widely used in HEP calculations, such as operations with 3-vectors and Lorentz vectors, helicity amplitudes, dynamical functions such as Breit-Wigner amplitudes, _etc_. These components are included in the `AmpliTF` library: https://github.com/apoluekt/AmpliTF. This library is a collection of simple functions and classes. 
 
