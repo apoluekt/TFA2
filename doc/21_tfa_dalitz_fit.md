@@ -96,3 +96,15 @@ The arguments of the constructor are: parameter name (should be the same as in t
 
 > __Excercise__: try adding `use_gradient = False` to the `run_minuit` call. 
 
+The output of the `run_minuit` call is the Python dictionary with various infromation, including fit result and uncertainties, the minimised NLL value, number of calls, _etc_ (see the output of `print(result)`). 
+
+At the end of the script, we are calculating the fit fractions of each component. This is finally where we will use component switches. First, we prepare a dictionary of fitted results in the form `{name : value}` from the `result` dictionary: 
+```python
+fitted_pars = { p : atfi.const(v[0]) for p,v in result["params"].items() }
+```
+Then we declare the third function derived from our `model`: 
+```python
+def fitted_model(x, switches = 4*[1]) :
+  return model(x, **fitted_pars, switches = switches)
+```
+for which the two arguments are the data tensor `x` and the list of switches. We should provide the default value for the list of switches, which will be used by the function `calculate_fit_fraction` to determine how many components there are. 
