@@ -21,6 +21,7 @@ git clone https://github.com/apoluekt/AmpliTF.git
 cd TFA2/
 conda env create -f env.yml  # or env_gpu.yml if you have GPU
 ```
+This will download and install all dependent packages, inpuding TensorFlow. Be patient! 
 
 ### Activate `TFA` environment
 ```
