@@ -54,7 +54,7 @@ pip install --user root-numpy
 
 ### Remove Conda environment
 
-`Conda` installs all dependencies in your home directory without touching the system-wide environment. To remove the `tfa` environment, do
+Once you finished playing with TensorFlow and don't want to continue, you can free up all the space it has taken by removing the `Conda` environment. `Conda` installs all dependencies in your home directory without touching the system-wide environment. To remove the `tfa` environment, do
 ```
 conda env remove --name tfa
 ```
