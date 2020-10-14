@@ -2,7 +2,7 @@
 
 Example is available here: https://github.com/apoluekt/TFA2/blob/master/demos/05_tfa_dalitz_fit_cached.py
 
-In this example, we will demonstrate an approach to the optimisation of calculations by caching certain quantities which don't need to be recalculated at every step of minimisation. In addition, we will demonstrate plotting the projections of the fit result, including components of the fitted function. Otherwise, the problem that is solved by the script is the same: generation and fitting of the D0 -> Ks pi+ pi- decay. 
+In this example, we will demonstrate an approach to the optimisation of calculations by caching certain quantities which don't need to be recalculated at every step of minimisation. In addition, we will demonstrate how to plot the projections of the fit result, including components of the fitted function. Otherwise, the problem that is solved by the script is the same: generation and fitting of the D0 -> Ks pi+ pi- decay. 
 
 The difference with the previous fit is that we fix the masses and widths of the intermediate rho(770) and K* resonances, and only float the complex couplings. As a result, we don't need to calculate the Breit-Wigner amplitudes at each minimisation step, but only once at the very beginning. However, during toy MC generation, the full amplitude has to be evaluated each time. In this script, the caching of Breit-Wigned amplitudes is done by defining a __higher-order function__ that takes the input tensor `x`, precalculates the amplitude terms for each entry of the input tensor, and returns the function to calculate the PDF with the fit paramaters as arguments: 
 
@@ -43,7 +43,7 @@ def model(x) :
   return _model
 ```
 
-The derived functions for toy MC generation, fitting and generation of the fit result is obtained from `model`. 
+The derived functions for toy MC generation, fitting and generation of the fit result is obtained from `model`. At the fitting step, the function `model(x)` is called only once for the data and normalisation samples (thus, the vectors of Breit-Wigner amplitudes and helicity terms are calculated only once). The functions returned by `model(x)` are then called at every minimisation step, reusing the chached information. 
 
 In addition to what was done in the previous script, we also demonstrate how one can plot 1D projections of the fit result including plotting the individual components of the amplitude. First step is to generate a large toy MC data sample from the fitted model with the argument `components=True` that adds component weights to the dataset: 
 ```python
