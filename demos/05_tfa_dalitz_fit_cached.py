@@ -15,8 +15,8 @@ mk  = atfi.const(0.498)
 mpi = atfi.const(0.139)
 md  = atfi.const(1.8646)
 
-dd = atfi.const(5.0)
-dr = atfi.const(1.5)
+rd = atfi.const(5.0)
+rr = atfi.const(1.5)
 
 mkst = atfi.const(0.892)
 wkst = atfi.const(0.050)
@@ -35,9 +35,9 @@ def model(x) :
   hel_bc = atfd.helicity_amplitude(phsp.cos_helicity_bc(x), 1)
   hel_ac = atfd.helicity_amplitude(phsp.cos_helicity_ac(x), 1)
 
-  bw1 = atfd.breit_wigner_lineshape(m2ab, mkst,  wkst,  mpi, mk, mpi, md, dr, dd, 1, 1)
-  bw2 = atfd.breit_wigner_lineshape(m2bc, mkst,  wkst,  mpi, mk, mpi, md, dr, dd, 1, 1)
-  bw3 = atfd.breit_wigner_lineshape(m2ac, mrho,  wrho,  mpi, mpi, mk, md, dr, dd, 1, 1)
+  bw1 = atfd.breit_wigner_lineshape(m2ab, mkst,  wkst,  mpi, mk, mpi, md, rd, rr, 1, 1)
+  bw2 = atfd.breit_wigner_lineshape(m2bc, mkst,  wkst,  mpi, mk, mpi, md, rd, rr, 1, 1)
+  bw3 = atfd.breit_wigner_lineshape(m2ac, mrho,  wrho,  mpi, mpi, mk, md, rd, rr, 1, 1)
 
   def _model(a1r, a1i, a2r, a2i, a3r, a3i, switches = 4*[1]) : 
 

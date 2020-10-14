@@ -45,11 +45,11 @@ def model(x, mrho, wrho, mkst, wkst, a1r, a1i, a2r, a2i, a3r, a3i, switches) :
     ampl = atfi.complex(atfi.const(0.), atfi.const(0.))
 
     if switches[0] : 
-      ampl += a1*atfd.breit_wigner_lineshape(m2ab, mkst,  wkst,  mpi, mk, mpi, md, dr, dd, 1, 1)*atfd.helicity_amplitude(hel_ab, 1)
+      ampl += a1*atfd.breit_wigner_lineshape(m2ab, mkst,  wkst,  mpi, mk, mpi, md, rd, rr, 1, 1)*atfd.helicity_amplitude(hel_ab, 1)
     if switches[1] : 
-      ampl += a2*atfd.breit_wigner_lineshape(m2bc, mkst,  wkst,  mpi, mk, mpi, md, dr, dd, 1, 1)*atfd.helicity_amplitude(hel_bc, 1)
+      ampl += a2*atfd.breit_wigner_lineshape(m2bc, mkst,  wkst,  mpi, mk, mpi, md, rd, rr, 1, 1)*atfd.helicity_amplitude(hel_bc, 1)
     if switches[2] : 
-      ampl += a3*atfd.breit_wigner_lineshape(m2ac, mrho,  wrho,  mpi, mpi, mk, md, dr, dd, 1, 1)*atfd.helicity_amplitude(hel_ac, 1)
+      ampl += a3*atfd.breit_wigner_lineshape(m2ac, mrho,  wrho,  mpi, mpi, mk, md, rd, rr, 1, 1)*atfd.helicity_amplitude(hel_ac, 1)
     if switches[3] : 
       ampl += atfi.cast_complex(atfi.ones(m2ab))*atfi.complex(atfi.const(5.), atfi.const(0.))
 
