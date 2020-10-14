@@ -58,3 +58,12 @@ Once you've finished playing with TensorFlow and don't want to continue, you can
 ```
 conda env remove --name tfa
 ```
+If you want to go even further and remove all the traces of `Conda` from your system, you need to remove the modifications it has done to your `.bashrc` script. Open the `$HOME/.bashrc` in editor and remove everything between 
+```sh
+# >>> conda initialize >>>
+```
+and 
+```
+# <<< conda initialize <<<
+```
+Finally, remove the `$HOME/miniconda2` directory. 
