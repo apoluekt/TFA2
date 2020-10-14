@@ -51,3 +51,10 @@ If you want to use `rootpy` and/or `root-numpy` as an interface between `numpy` 
 pip install --user rootpy
 pip install --user root-numpy
 ```
+
+### Remove Conda environment
+
+`Conda` installs all dependencies in your home directory without touching the system-wide environment. To remove the `tfa` environment, do
+```
+conda env remove --name tfa
+```
