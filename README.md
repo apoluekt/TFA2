@@ -1,4 +1,4 @@
-# TensorFlowAnalysis
+# TensorFlowAnalysis2
 Tools for high-energy physics analyses using TensorFlow v2
 
 ## Introduction
@@ -8,7 +8,7 @@ plotting with matplotlib, etc.
 
 ## Prerequisites
 
-   * TensorFlow v2.1
+   * TensorFlow >= v2.1
    * NumPy
    * iminuit 
    * uproot 
@@ -17,8 +17,7 @@ plotting with matplotlib, etc.
 
 ## Links
 
-   * TensorFlowAnalysis: https://gitlab.cern.ch/poluekt/TensorFlowAnalysis
+   * TensorFlowAnalysis (version for TF v1): https://gitlab.cern.ch/poluekt/TensorFlowAnalysis
    * ZFit: https://github.com/zfit/zfit
    * ComPWA: https://github.com/ComPWA
    * AmpliTF: https://github.com/apoluekt/AmpliTF
-
