@@ -89,9 +89,13 @@ def plot_distr2d(xarr, yarr, bins, ranges, fig, ax, labels, cmap = "YlOrBr",
   counts, xedges, yedges = fasthist2d(xarr, yarr, bins = bins, ranges = ranges, weights = weights)
 
   norm = None
+  vmax = np.max(counts)
+  vmin = np.min(counts)
+  if len(ranges)>2 : 
+    vmin = ranges[2][0]
+    vmax = ranges[2][1]
+    norm = matplotlib.colors.Normalize(vmin = vmin, vmax = vmax)
   if log : 
-    vmax = np.max(counts)
-    vmin = np.min(counts)
     if vmin <= 0. : vmin = 1.
     if vmax <= vmin : vmax = vmin
     norm = matplotlib.colors.LogNorm(vmin = vmin, vmax = vmax)
@@ -164,7 +168,11 @@ def plot_distr1d(arr, bins, range, ax, label, log = False, units = None, weights
     else : 
       ax.plot(xarr, dataarr, color = this_color)
       ax.fill_between( xarr, dataarr, 0., color = this_color, alpha = 0.1)
-  ax.set_ylim(bottom = 0.)
+  if not log : 
+    ax.set_ylim(bottom = 0.)
+  else : 
+    ax.set_ylim(bottom = 0.1)
+    ax.set_yscale('log')
   ax.set_xlabel(label_title(label, units), ha='right', x=1.0)
   ax.set_ylabel(y_label_title(range, bins, units), ha='right', y=1.0)
   if title is None : 
@@ -227,7 +235,11 @@ def plot_distr1d_comparison(data, fit, bins, range, ax, label, log = False, unit
       legend_ax.legend(h, l, borderaxespad=0)
       legend_ax.axis("off")
     else : ax.legend(loc = "best")
-  ax.set_ylim(bottom = 0.)
+  if not log : 
+    ax.set_ylim(bottom = 0.)
+  else : 
+    ax.set_ylim(bottom = 0.1)
+    ax.set_yscale('log')
   ax.set_xlabel(label_title(label, units), ha='right', x=1.0)
   ax.set_ylabel(y_label_title(range, bins, units), ha='right', y=1.0)
   if title is None : 
