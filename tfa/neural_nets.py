@@ -23,37 +23,51 @@ import amplitf.interface as atfi
 import tfa.rootio as atfr
 import tfa.plotting as atfp
 
-def create_weights_biases(n_input, layers, sigma=1., n_output = 1):
+
+def create_weights_biases(n_input, layers, sigma=1.0, n_output=1):
     """
-      Create arrays of weights and vectors of biases for the multilayer perceptron 
-      if a given configuration (with a single output neuron). 
-        n_input : number of input neurons
-        layers  : list of numbers of neurons in the hidden layers
-      output : 
-        weights, biases
+    Create arrays of weights and vectors of biases for the multilayer perceptron
+    if a given configuration (with a single output neuron).
+      n_input : number of input neurons
+      layers  : list of numbers of neurons in the hidden layers
+    output :
+      weights, biases
     """
     n_hidden = [n_input] + layers
     weights = []
     biases = []
-    for i in range(len(n_hidden)-1):
-        weights += [tf.Variable(sigma*np.random.normal(
-            size=[n_hidden[i], n_hidden[i+1]]), dtype=atfi.fptype())]
-        biases += [tf.Variable(sigma *
-                               np.random.normal(size=[n_hidden[i+1]]), dtype = atfi.fptype())]
-    weights += [tf.Variable(sigma *
-                            np.random.normal(size=[n_hidden[-1], n_output]), dtype = atfi.fptype())]
-    biases += [tf.Variable(sigma*np.random.normal(size=[n_output]), dtype = atfi.fptype())]
+    for i in range(len(n_hidden) - 1):
+        weights += [
+            tf.Variable(
+                sigma * np.random.normal(size=[n_hidden[i], n_hidden[i + 1]]),
+                dtype=atfi.fptype(),
+            )
+        ]
+        biases += [
+            tf.Variable(
+                sigma * np.random.normal(size=[n_hidden[i + 1]]), dtype=atfi.fptype()
+            )
+        ]
+    weights += [
+        tf.Variable(
+            sigma * np.random.normal(size=[n_hidden[-1], n_output]), dtype=atfi.fptype()
+        )
+    ]
+    biases += [
+        tf.Variable(sigma * np.random.normal(size=[n_output]), dtype=atfi.fptype())
+    ]
     return (weights, biases)
+
 
 def init_weights_biases(init):
     """
-      Initialise variable weights and biases from numpy array
+    Initialise variable weights and biases from numpy array
     """
     init_weights = init[0]
     init_biases = init[1]
     weights = []
     biases = []
-    for i in range(len(init_weights)-1):
+    for i in range(len(init_weights) - 1):
         weights += [tf.Variable(init_weights[i], dtype=atfi.fptype())]
         biases += [tf.Variable(init_biases[i], dtype=atfi.fptype())]
     weights += [tf.Variable(init_weights[-1], dtype=atfi.fptype())]
@@ -63,45 +77,52 @@ def init_weights_biases(init):
 
 def init_fixed_weights_biases(init):
     """
-      Initialise constant weights and biases from numpy array
+    Initialise constant weights and biases from numpy array
     """
     init_weights = init[0]
     init_biases = init[1]
     weights = []
     biases = []
-    for i in range(len(init_weights)-1):
+    for i in range(len(init_weights) - 1):
         weights += [tf.constant(init_weights[i], dtype=atfi.fptype())]
         biases += [tf.constant(init_biases[i], dtype=atfi.fptype())]
     weights += [tf.constant(init_weights[-1], dtype=atfi.fptype())]
     biases += [tf.constant(init_biases[-1], dtype=atfi.fptype())]
     return (weights, biases)
 
-def normalise(array, ranges) : 
-    v = [ (array[:,i]-ranges[i][0])/(ranges[i][1]-ranges[i][0]) for i in range(len(ranges)) ]
-    return tf.stack(v, axis = 1)
+
+def normalise(array, ranges):
+    v = [
+        (array[:, i] - ranges[i][0]) / (ranges[i][1] - ranges[i][0])
+        for i in range(len(ranges))
+    ]
+    return tf.stack(v, axis=1)
+
 
 @tf.function
-def multilayer_perceptron(x, ranges, weights, biases, multiple = False):
+def multilayer_perceptron(x, ranges, weights, biases, multiple=False):
     """
-      Multilayer perceptron with fully connected layers defined by matrices of weights and biases. 
-      Use sigmoid function as activation. 
+    Multilayer perceptron with fully connected layers defined by matrices of weights and biases.
+    Use sigmoid function as activation.
     """
     layer = normalise(x, ranges)
     for i in range(len(weights)):
         layer = tf.nn.sigmoid(tf.add(tf.matmul(layer, weights[i]), biases[i]))
-    if multiple : 
-      return layer
-    else : 
-      return layer[:, 0]
+    if multiple:
+        return layer
+    else:
+        return layer[:, 0]
+
 
 def l2_regularisation(weights):
     """
-      L2 regularisation term for a list of weight matrices
+    L2 regularisation term for a list of weight matrices
     """
-    penalty = 0.
+    penalty = 0.0
     for w in weights:
         penalty += tf.reduce_sum(tf.square(w))
     return penalty
+
 
 def estimate_density(
     phsp,
@@ -109,33 +130,33 @@ def estimate_density(
     ranges,
     labels,
     weight=None,
-    transform = None, 
-    transform_ranges = None, 
+    transform=None,
+    transform_ranges=None,
     learning_rate=0.001,
     training_epochs=100000,
     norm_size=1000000,
     print_step=50,
     display_step=500,
-    weight_penalty=1.,
+    weight_penalty=1.0,
     n_hidden=[32, 8],
     initfile="init.npy",
     outfile="train",
     seed=1,
-    fig = None, 
-    axes = None, 
+    fig=None,
+    axes=None,
 ):
 
     tf.compat.v1.disable_eager_execution()
 
     n_input = len(ranges)
 
-    bins = n_input*[ 50 ]
+    bins = n_input * [50]
 
     tf.compat.v1.set_random_seed(seed)
-    np.random.seed(seed+12345)
+    np.random.seed(seed + 12345)
 
     try:
-        init_w = np.load(initfile, allow_pickle = True)
+        init_w = np.load(initfile, allow_pickle=True)
     except:
         init_w = None
 
@@ -146,28 +167,34 @@ def estimate_density(
         print("Creating random weights")
         (weights, biases) = create_weights_biases(n_input, n_hidden)
 
-    data_ph = tf.compat.v1.placeholder(atfi.fptype(), shape = (None, None), name = "data")
-    norm_ph = tf.compat.v1.placeholder(atfi.fptype(), shape = (None, None), name = "norm")
+    data_ph = tf.compat.v1.placeholder(atfi.fptype(), shape=(None, None), name="data")
+    norm_ph = tf.compat.v1.placeholder(atfi.fptype(), shape=(None, None), name="norm")
 
-    if not transform_ranges : transform_ranges = ranges
+    if not transform_ranges:
+        transform_ranges = ranges
 
     def model(x):
-        if transform : x2 = transform(x)
-        else : x2 = x
+        if transform:
+            x2 = transform(x)
+        else:
+            x2 = x
         # to make sure PDF is always strictly positive
         return multilayer_perceptron(x2, transform_ranges, weights, biases) + 1e-20
 
     data_model = model(data_ph)
     norm_model = model(norm_ph)
 
-    def unbinned_nll(pdf, integral) : 
-        return -tf.reduce_sum(atfi.log(pdf/integral))
+    def unbinned_nll(pdf, integral):
+        return -tf.reduce_sum(atfi.log(pdf / integral))
 
-    def integral(pdf) : 
+    def integral(pdf):
         return tf.reduce_mean(pdf)
 
     # Define loss and optimizer
-    nll = unbinned_nll(data_model, integral(norm_model)) + l2_regularisation(weights)*weight_penalty
+    nll = (
+        unbinned_nll(data_model, integral(norm_model))
+        + l2_regularisation(weights) * weight_penalty
+    )
 
     optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=learning_rate)
     train_op = optimizer.minimize(nll)
@@ -178,7 +205,7 @@ def estimate_density(
     with tf.compat.v1.Session() as sess:
         sess.run(init)
 
-        data_sample = sess.run(phsp.filter(data_ph), feed_dict = { data_ph : data})
+        data_sample = sess.run(phsp.filter(data_ph), feed_dict={data_ph: data})
 
         norm_sample = sess.run(phsp.uniform_sample(norm_size))
         print("Normalisation sample size = ", len(norm_sample))
@@ -189,32 +216,37 @@ def estimate_density(
         # Training cycle
         best_cost = 1e10
 
-        display = atfp.MultidimDisplay(data_sample, norm_sample, bins, ranges, labels, fig, axes)
+        display = atfp.MultidimDisplay(
+            data_sample, norm_sample, bins, ranges, labels, fig, axes
+        )
         plt.ion()
         plt.show()
         plt.pause(0.1)
 
         for epoch in range(training_epochs):
 
-            _, c = sess.run([train_op, nll], feed_dict={
-                            data_ph: data_sample, norm_ph: norm_sample})
+            _, c = sess.run(
+                [train_op, nll], feed_dict={data_ph: data_sample, norm_ph: norm_sample}
+            )
 
-            if epoch % display_step == 0 and fig :
+            if epoch % display_step == 0 and fig:
                 w = sess.run(norm_model, feed_dict={norm_ph: norm_sample})
                 display.draw(w)
-                plt.tight_layout(pad=1., w_pad=1., h_pad=1.)
+                plt.tight_layout(pad=1.0, w_pad=1.0, h_pad=1.0)
                 plt.draw()
                 plt.pause(0.1)
                 plt.savefig(outfile + ".pdf")
 
-            if epoch % print_step == 0 :
-                s = "Epoch %d, cost %.9f" % (epoch+1, c)
+            if epoch % print_step == 0:
+                s = "Epoch %d, cost %.9f" % (epoch + 1, c)
                 print(s)
                 if c < best_cost:
                     best_cost = c
                     w = sess.run(norm_model, feed_dict={norm_ph: norm_sample})
-                    scale = 1./np.mean(w)
-                    np.save(outfile, [ scale, transform_ranges ] + sess.run([weights, biases]))
+                    scale = 1.0 / np.mean(w)
+                    np.save(
+                        outfile, [scale, transform_ranges] + sess.run([weights, biases])
+                    )
                     f = open(outfile + ".txt", "w")
                     f.write(s + "\n")
                     f.close()

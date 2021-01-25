@@ -17,7 +17,7 @@ __all__ = [
     "toymc",
     "plotting",
     "rootio",
-    "neural_nets", 
+    "neural_nets",
 ]
 
 from . import optimisation
@@ -25,4 +25,3 @@ from . import toymc
 from . import plotting
 from . import rootio
 from . import neural_nets
-

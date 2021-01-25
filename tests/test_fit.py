@@ -16,8 +16,9 @@
 import tensorflow as tf
 
 import sys, os
+
 sys.path.append("../")
-#os.environ["CUDA_VISIBLE_DEVICES"] = ""   # Do not use GPU
+# os.environ["CUDA_VISIBLE_DEVICES"] = ""   # Do not use GPU
 
 import amplitf.interface as atfi
 import amplitf.kinematics as atfk
@@ -31,68 +32,76 @@ from ROOT import TFile
 
 tf.config.experimental_run_functions_eagerly(False)
 
-if __name__ == "__main__" : 
+if __name__ == "__main__":
 
-  # Four body angular phase space is described by 3 angles. 
-  phsp = RectangularPhaseSpace(((-1., 1.), (-1., 1.), (-atfi.pi(), atfi.pi())))
+    # Four body angular phase space is described by 3 angles.
+    phsp = RectangularPhaseSpace(((-1.0, 1.0), (-1.0, 1.0), (-atfi.pi(), atfi.pi())))
 
-  # Fit parameters of the model 
-  FL = atfo.FitParameter("FL" ,  0.770,  0.000, 1.000, 0.01)
-  AT2 = atfo.FitParameter("AT2",  0.200, -1.000, 1.000, 0.01)
-  S5 = atfo.FitParameter("S5" , -0.100, -1.000, 1.000, 0.01)
+    # Fit parameters of the model
+    FL = atfo.FitParameter("FL", 0.770, 0.000, 1.000, 0.01)
+    AT2 = atfo.FitParameter("AT2", 0.200, -1.000, 1.000, 0.01)
+    S5 = atfo.FitParameter("S5", -0.100, -1.000, 1.000, 0.01)
 
-  pars = [ FL, AT2, S5 ]
+    pars = [FL, AT2, S5]
 
-  ### Start of model description
+    ### Start of model description
 
-  @atfi.function
-  def model(x) : 
-    # Get phase space variables
-    cosThetaK = phsp.coordinate(x, 0)
-    cosThetaL = phsp.coordinate(x, 1)
-    phi = phsp.coordinate(x, 2)
+    @atfi.function
+    def model(x):
+        # Get phase space variables
+        cosThetaK = phsp.coordinate(x, 0)
+        cosThetaL = phsp.coordinate(x, 1)
+        phi = phsp.coordinate(x, 2)
 
-    # Derived quantities
-    sinThetaK = atfi.sqrt(1.0 - cosThetaK * cosThetaK)
-    sinThetaL = atfi.sqrt(1.0 - cosThetaL * cosThetaL)
+        # Derived quantities
+        sinThetaK = atfi.sqrt(1.0 - cosThetaK * cosThetaK)
+        sinThetaL = atfi.sqrt(1.0 - cosThetaL * cosThetaL)
 
-    sinTheta2K =  (1.0 - cosThetaK * cosThetaK)
-    sinTheta2L =  (1.0 - cosThetaL * cosThetaL)
+        sinTheta2K = 1.0 - cosThetaK * cosThetaK
+        sinTheta2L = 1.0 - cosThetaL * cosThetaL
 
-    sin2ThetaK = (2.0 * sinThetaK * cosThetaK)
-    cos2ThetaL = (2.0 * cosThetaL * cosThetaL - 1.0)
+        sin2ThetaK = 2.0 * sinThetaK * cosThetaK
+        cos2ThetaL = 2.0 * cosThetaL * cosThetaL - 1.0
 
-    # Decay density
-    pdf  = (3.0/4.0) * (1.0 - FL ) * sinTheta2K
-    pdf +=  FL * cosThetaK * cosThetaK
-    pdf +=  (1.0/4.0) * (1.0 - FL) * sin2ThetaK *  cos2ThetaL
-    pdf +=  (-1.0) * FL * cosThetaK * cosThetaK *  cos2ThetaL
-    pdf +=  (1.0/2.0) * (1.0 - FL) * AT2 * sinTheta2K * sinTheta2L * atfi.cos(2.0 * phi)
-    pdf +=  S5 * sin2ThetaK * sinThetaL * atfi.cos(phi)
+        # Decay density
+        pdf = (3.0 / 4.0) * (1.0 - FL) * sinTheta2K
+        pdf += FL * cosThetaK * cosThetaK
+        pdf += (1.0 / 4.0) * (1.0 - FL) * sin2ThetaK * cos2ThetaL
+        pdf += (-1.0) * FL * cosThetaK * cosThetaK * cos2ThetaL
+        pdf += (
+            (1.0 / 2.0)
+            * (1.0 - FL)
+            * AT2
+            * sinTheta2K
+            * sinTheta2L
+            * atfi.cos(2.0 * phi)
+        )
+        pdf += S5 * sin2ThetaK * sinThetaL * atfi.cos(phi)
 
-    return atfi.abs(pdf)
-  ### End of model description
+        return atfi.abs(pdf)
 
-  atfi.set_seed(1)
+    ### End of model description
 
-  # Estimate the maximum of PDF for toy MC generation using accept-reject method
-  maximum = atft.maximum_estimator(model, phsp, 100000) * 1.5
-  print("Maximum = ", maximum)
+    atfi.set_seed(1)
 
-  # Create toy MC data sample (with the model parameters set to their initial values)
-  data_sample = atft.run_toymc(model, phsp, 1000000, maximum, chunk = 1000000)
+    # Estimate the maximum of PDF for toy MC generation using accept-reject method
+    maximum = atft.maximum_estimator(model, phsp, 100000) * 1.5
+    print("Maximum = ", maximum)
 
-  print(data_sample)
+    # Create toy MC data sample (with the model parameters set to their initial values)
+    data_sample = atft.run_toymc(model, phsp, 1000000, maximum, chunk=1000000)
 
-  norm_sample = phsp.uniform_sample(1000000)
+    print(data_sample)
 
-  # TF graph for unbinned negalite log likelihood (the quantity to be minimised)
-  @atfi.function
-  def nll(data, norm) : 
-    return atfl.unbinned_nll(model(data), atfl.integral(model(norm)))
+    norm_sample = phsp.uniform_sample(1000000)
 
-  # Run MINUIT minimisation of the neg. log likelihood
-  result = atfo.run_minuit(nll, pars, args = (data_sample, norm_sample))
-  print(result)
+    # TF graph for unbinned negalite log likelihood (the quantity to be minimised)
+    @atfi.function
+    def nll(data, norm):
+        return atfl.unbinned_nll(model(data), atfl.integral(model(norm)))
 
-  print(f"{result['time']/result['func_calls']} sec per function call")
+    # Run MINUIT minimisation of the neg. log likelihood
+    result = atfo.run_minuit(nll, pars, args=(data_sample, norm_sample))
+    print(result)
+
+    print(f"{result['time']/result['func_calls']} sec per function call")
