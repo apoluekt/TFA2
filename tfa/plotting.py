@@ -152,6 +152,7 @@ def plot_distr2d(
         cb.ax.set_ylabel(zt, ha="right", y=1.0)
         if log:
             cb.ax.set_yscale("log")
+    return (vmin, vmax)
 
 
 def plot_distr1d(
@@ -418,6 +419,7 @@ class MultidimDisplay:
         self.size = data.shape[0]
         self.first = True
         self.newaxes = []
+        self.zrange = {}
         n = 0
         for i in range(self.dim):
             for j in range(i):
@@ -425,7 +427,7 @@ class MultidimDisplay:
                     ax1 = axes[(n // (self.dim // 2)) + 1, 2 * (n % (self.dim // 2))]
                 else:
                     ax1 = axes[2 * (n // self.dim) + 1, n % self.dim]
-                plot_distr2d(
+                self.zrange[(i, j)] = plot_distr2d(
                     data[:, i],
                     data[:, j],
                     bins=(bins[i], bins[j]),
@@ -457,6 +459,7 @@ class MultidimDisplay:
                 weights=scale * weights,
                 pull=True,
                 data_alpha=0.3,
+                title = self.labels[i]
             )
             self.newaxes += newax
 
@@ -474,7 +477,7 @@ class MultidimDisplay:
                     self.norm[:, i],
                     self.norm[:, j],
                     bins=(self.bins[i], self.bins[j]),
-                    ranges=(self.ranges[i], self.ranges[j]),
+                    ranges=(self.ranges[i], self.ranges[j], self.zrange[(i, j)]),
                     fig=self.fig,
                     ax=ax2,
                     labels=(self.labels[i], self.labels[j]),

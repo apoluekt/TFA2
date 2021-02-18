@@ -31,7 +31,7 @@ def read_tuple(rootfile, branches, tree="tree"):
 
 
 def read_tuple_filtered(
-    rootfile, branches, tree="tree", selection=None, sel_branches=[]
+    rootfile, branches=None, tree="tree", selection=None, sel_branches=[]
 ):
     """
     Load the contents of the tree from the ROOT file into numpy array,
@@ -40,10 +40,18 @@ def read_tuple_filtered(
     arrays = []
     with uproot.open(rootfile) as file:
         t = file[tree]
-        for data in t.pandas.iterate(branches=branches + sel_branches):
+        if branches is None:
+            read_branches = store_branches = t.keys()
+        else:
+            read_branches = branches + sel_branches
+            store_branches = branches
+        for data in t.pandas.iterate(branches=read_branches):
             if selection:
                 df = data.query(selection)
             else:
                 df = data
-            arrays += [df[list(branches)].to_numpy()]
-    return np.concatenate(arrays, axis=0)
+            arrays += [df[list(store_branches)].to_numpy()]
+    if branches is None:
+        return np.concatenate(arrays, axis=0), read_branches
+    else:
+        return np.concatenate(arrays, axis=0)

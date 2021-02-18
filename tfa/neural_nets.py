@@ -130,6 +130,139 @@ def estimate_density(
     ranges,
     labels,
     weight=None,
+    transform = None, 
+    transform_ranges = None, 
+    learning_rate=0.001,
+    training_epochs=100000,
+    norm_size=1000000,
+    print_step=50,
+    display_step=500,
+    weight_penalty=1.,
+    n_hidden=[32, 8],
+    initfile="init.npy",
+    outfile="train",
+    seed=1,
+    fig = None, 
+    axes = None, 
+    units = None, 
+    model = None, 
+    regularisation = None, 
+):
+
+    n_input = len(ranges)
+
+    bins = n_input*[ 50 ]
+
+    atfi.set_seed(seed)
+
+    if model is None : 
+        try:
+            init_w = np.load(initfile, allow_pickle = True)
+        except:
+            init_w = None
+
+        if isinstance(init_w, np.ndarray):
+            print("Loading saved weights")
+            (weights, biases) = init_weights_biases(init_w[2:])
+        else:
+            print("Creating random weights")
+            (weights, biases) = create_weights_biases(n_input, n_hidden)
+
+        if not transform_ranges : transform_ranges = ranges
+
+        def fitmodel(x):
+            if transform : x2 = transform(x)
+            else : x2 = x
+            # to make sure PDF is always strictly positive
+            return multilayer_perceptron(x2, transform_ranges, weights, biases) + 1e-20
+
+        parameters = [weights, biases]
+    else : 
+        fitmodel, parameters = model
+
+    @tf.function
+    def unbinned_nll(pdf, integral) : 
+        return -tf.reduce_sum(atfi.log(pdf/integral))
+
+    @tf.function
+    def integral(pdf) : 
+        return tf.reduce_mean(pdf)
+
+    opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+
+    data_sample = phsp.filter(data)
+
+    if isinstance(norm_size, int) : 
+        norm_sample = phsp.uniform_sample(norm_size)
+    else : 
+        norm_sample = norm_size
+    print("Normalisation sample size = ", len(norm_sample))
+    print(norm_sample)
+    print("Data sample size = ", len(data_sample))
+    print(data_sample)
+
+    if model is None : 
+        # Define loss and optimizer
+        if regularisation is None : 
+            @tf.function
+            def nll() : 
+                return unbinned_nll(fitmodel(data_sample), integral(fitmodel(norm_sample))) + l2_regularisation(weights)*weight_penalty
+        else : 
+            @tf.function
+            def nll() : 
+                return unbinned_nll(fitmodel(data_sample), integral(fitmodel(norm_sample))) + regularisation(weights)
+    else : 
+        @tf.function
+        def nll() : 
+            return unbinned_nll(fitmodel(data_sample), integral(fitmodel(norm_sample)))
+
+    # Training cycle
+    best_cost = 1e10
+
+    display = atfp.MultidimDisplay(data_sample, norm_sample, bins, ranges, labels, fig, axes, units = units)
+    plt.ion()
+    plt.show()
+    plt.pause(0.1)
+
+    for epoch in range(training_epochs):
+
+        if epoch % display_step == 0 and fig :
+            w = fitmodel(norm_sample)
+            display.draw(w)
+            plt.tight_layout(pad=0., w_pad=0., h_pad=0.)
+            plt.draw()
+            plt.pause(0.1)
+            plt.savefig(outfile + ".pdf")
+
+        if epoch % print_step == 0 :
+            c = nll()
+            s = "Epoch %d, cost %.9f" % (epoch+1, c)
+            print(s)
+            if c < best_cost:
+                best_cost = c
+                w = fitmodel(norm_sample)
+                scale = 1./np.mean(w)
+                if model is None : 
+                    weights = [w.numpy() for w in parameters[0]]
+                    biases =  [b.numpy() for b in parameters[1]]
+                    np.save(outfile, [ scale, transform_ranges, weights, biases] )
+                else : 
+                    np.save(outfile, [ scale, transform_ranges] + [p.numpy() for p in parameters() ] )
+                f = open(outfile + ".txt", "w")
+                f.write(s + "\n")
+                f.close()
+
+        opt.minimize(nll, parameters)
+
+    print("Optimization Finished!")
+
+
+def estimate_density_old(
+    phsp,
+    data,
+    ranges,
+    labels,
+    weight=None,
     transform=None,
     transform_ranges=None,
     learning_rate=0.001,
@@ -152,8 +285,8 @@ def estimate_density(
 
     bins = n_input * [50]
 
-    tf.compat.v1.set_random_seed(seed)
-    np.random.seed(seed + 12345)
+    #tf.compat.v1.set_random_seed(seed)
+    #np.random.seed(seed + 12345)
 
     try:
         init_w = np.load(initfile, allow_pickle=True)
@@ -209,7 +342,10 @@ def estimate_density(
 
         norm_sample = sess.run(phsp.uniform_sample(norm_size))
         print("Normalisation sample size = ", len(norm_sample))
-        print(norm_sample)
+        print(norm_sample[:,0])
+        print(norm_sample[:,1])
+        print(norm_sample[:,2])
+        print(norm_sample[:,3])
         print("Data sample size = ", len(data_sample))
         print(data_sample)
 
