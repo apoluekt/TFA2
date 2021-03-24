@@ -122,9 +122,9 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     else:
         minuit = Minuit(func,start,name=name)
 
+    minuit.errordef=Minuit.LIKELIHOOD
     minuit.errors = error
     minuit.limits = limit
-    minuit.errordef=0.5
 
     initlh = func(start)
     starttime = timer()

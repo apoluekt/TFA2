@@ -31,10 +31,13 @@ sys.path.append("../")
 import amplitf.interface as atfi
 import amplitf.kinematics as atfk
 import amplitf.dynamics as atfd
-import amplitf.toymc as atft
+import amplitf.toymc as tft
 import amplitf.likelihood as atfl
 import amplitf.optimisation as atfo
 from amplitf.phasespace.dalitz_phasespace import DalitzPhaseSpace
+
+# Import TFA modules
+import tfa.toymc as tft
 
 # Calculate orbital momentum for a decay of a particle
 # of a given spin and parity to a proton (J^p=1/2+) and a pseudoscalar.
@@ -351,11 +354,11 @@ if __name__ == "__main__":
     print(norm_sample)
 
     # Calculate maximum of the PDF for accept-reject toy MC generation
-    maximum = atft.maximum_estimator(model, phsp, 100000) * 1.5
+    maximum = tft.maximum_estimator(model, phsp, 100000) * 1.5
     print("Maximum = ", maximum)
 
     # Create toy MC data sample
-    data_sample = atft.run_toymc(model, phsp, toy_sample, maximum, chunk=1000000)
+    data_sample = tft.run_toymc(model, phsp, toy_sample, maximum, chunk=1000000)
     print(data_sample)
 
     @atfi.function
