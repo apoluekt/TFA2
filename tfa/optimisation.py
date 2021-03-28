@@ -68,13 +68,15 @@ class FitParameter:
         return self.var.numpy()
 
 
-def run_minuit(nll, pars, use_gradient=True):
+def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = False):
     """
     Run IMinuit to minimise NLL function
 
     nll  : python callable representing the negative log likelihood to be minimised
     pars : list of FitParameters
     use_gradient : if True, use analytic gradient
+    use_hesse : if True, uses HESSE for error estimation
+    use_minos : if True, use MINOS for asymmetric error estimation
 
     returns the dictionary with the values and errors of the fit parameters
     """
@@ -116,27 +118,30 @@ def run_minuit(nll, pars, use_gradient=True):
     name = [p.name for p in float_pars]
 
     if use_gradient:
-        minuit = Minuit.from_array_func(
-            func,
-            start,
-            error=error,
-            limit=limit,
-            name=name,
-            grad=gradient,
-            errordef=0.5,
-        )
+        minuit = Minuit(func,start,grad=gradient,name=name)
     else:
-        minuit = Minuit.from_array_func(
-            func, start, error=error, limit=limit, name=name, errordef=0.5
-        )
+        minuit = Minuit(func,start,name=name)
+
+    minuit.errordef=Minuit.LIKELIHOOD
+    minuit.errors = error
+    minuit.limits = limit
 
     initlh = func(start)
     starttime = timer()
     minuit.migrad()
+    if use_hesse:
+        minuit.hesse()
+
+    if use_minos:
+        minuit.minos()
+
     endtime = timer()
 
-    par_states = minuit.get_param_states()
-    f_min = minuit.get_fmin()
+    par_states = minuit.params
+    f_min = minuit.fmin
+    #print the nice tables of fit results
+    print(f_min)
+    print(par_states)
 
     results = {"params": {}}  # Get fit results and update parameters
     for n, p in enumerate(float_pars):
@@ -150,10 +155,17 @@ def run_minuit(nll, pars, use_gradient=True):
     # return fit results
     results["initlh"] = initlh
     results["loglh"] = f_min.fval
-    results["iterations"] = f_min.ncalls
+    results["iterations"] = f_min.nfcn
     results["func_calls"] = func.n
     results["grad_calls"] = gradient.n
     results["time"] = endtime - starttime
+    #is_valid == (has_valid_parameters & !has_reached_call_limit & !is_above_max_edm)
+    results["is_valid"] = int(f_min.is_valid) 
+    results["has_parameters_at_limit"] = int(f_min.has_parameters_at_limit)
+    results["has_accurate_covar"] = int(f_min.has_accurate_covar)
+    results["has_posdef_covar"] = int(f_min.has_posdef_covar)
+    results["has_made_posdef_covar"] = int(f_min.has_made_posdef_covar)
+    results["has_reached_call_limit"] = int(f_min.has_reached_call_limit)
     return results
 
 

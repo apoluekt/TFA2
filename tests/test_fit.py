@@ -23,10 +23,12 @@ sys.path.append("../")
 import amplitf.interface as atfi
 import amplitf.kinematics as atfk
 import amplitf.dynamics as atfd
-import amplitf.toymc as atft
 import amplitf.likelihood as atfl
 import amplitf.optimisation as atfo
 from amplitf.phasespace.rectangular_phasespace import RectangularPhaseSpace
+
+# Import TFA modules
+import tfa.toymc as tft
 
 from ROOT import TFile
 
@@ -85,11 +87,11 @@ if __name__ == "__main__":
     atfi.set_seed(1)
 
     # Estimate the maximum of PDF for toy MC generation using accept-reject method
-    maximum = atft.maximum_estimator(model, phsp, 100000) * 1.5
+    maximum = tft.maximum_estimator(model, phsp, 100000) * 1.5
     print("Maximum = ", maximum)
 
     # Create toy MC data sample (with the model parameters set to their initial values)
-    data_sample = atft.run_toymc(model, phsp, 1000000, maximum, chunk=1000000)
+    data_sample = tft.run_toymc(model, phsp, 1000000, maximum, chunk=1000000)
 
     print(data_sample)
 
