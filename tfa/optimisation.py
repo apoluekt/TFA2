@@ -218,7 +218,7 @@ def calculate_fit_fractions(pdf, norm_sample):
     ]
 
 
-def write_fit_results(pars, results, filename, get_covariance = False):
+def write_fit_results(pars, results, filename, store_covariance = False):
     """
     Write the dictionary of fit results to text file
       pars     : list of FitParameter objects
@@ -237,7 +237,7 @@ def write_fit_results(pars, results, filename, get_covariance = False):
     f.write(s + "\n")
     f.close()
 
-    if get_covariance = True:
+    if store_covariance = True:
         covmatrix = results['covmatrix']
         fcov = open(filename.replace('.txt','_cov.txt'), "w")
         for k1 in list(covmatrix.keys()):
