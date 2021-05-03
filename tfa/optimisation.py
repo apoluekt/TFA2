@@ -68,7 +68,7 @@ class FitParameter:
         return self.var.numpy()
 
 
-def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = False):
+def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = False, get_covariance = False):
     """
     Run IMinuit to minimise NLL function
 
@@ -77,6 +77,7 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     use_gradient : if True, use analytic gradient
     use_hesse : if True, uses HESSE for error estimation
     use_minos : if True, use MINOS for asymmetric error estimation
+    get_covariance: if True, get the covariance matrix from the fit
 
     returns the dictionary with the values and errors of the fit parameters
     """
@@ -142,6 +143,7 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     #print the nice tables of fit results
     print(f_min)
     print(par_states)
+    print(minuit.covariance.correlation())
 
     results = {"params": {}}  # Get fit results and update parameters
     for n, p in enumerate(float_pars):
@@ -166,6 +168,17 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     results["has_posdef_covar"] = int(f_min.has_posdef_covar)
     results["has_made_posdef_covar"] = int(f_min.has_made_posdef_covar)
     results["has_reached_call_limit"] = int(f_min.has_reached_call_limit)
+
+    #store covariance matrix of parameters
+    if get_covariance:
+        covarmatrix = {}
+        for p1 in float_pars:
+            covarmatrix[p1.name] = {}
+            for p2 in float_pars:
+                covarmatrix[p1.name][p2.name] = minuit.covariance[p1.name, p2.name]
+
+        results["covmatrix"] = covarmatrix
+
     return results
 
 
@@ -205,7 +218,7 @@ def calculate_fit_fractions(pdf, norm_sample):
     ]
 
 
-def write_fit_results(pars, results, filename):
+def write_fit_results(pars, results, filename, get_covariance = False):
     """
     Write the dictionary of fit results to text file
       pars     : list of FitParameter objects
@@ -223,3 +236,12 @@ def write_fit_results(pars, results, filename):
     s = "loglh %f %f" % (results["loglh"], results["initlh"])
     f.write(s + "\n")
     f.close()
+
+    if get_covariance = True:
+        covmatrix = results['covmatrix']
+        fcov = open(filename.replace('.txt','_cov.txt'), "w")
+        for k1 in list(covmatrix.keys()):
+            for k2 in list(covmatrix[k1].keys()):
+                s = "%s %s %f" % (k1, k2, covmatrix[k1][k2])
+                fcov.write(s + "\n")
+        fcov.close()
