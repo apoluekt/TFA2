@@ -261,6 +261,7 @@ def plot_distr1d_comparison(
     weights=None,
     pull=False,
     cweights=None,
+    dataweights=None,
     title=None,
     legend=None,
     color=None,
@@ -280,7 +281,7 @@ def plot_distr1d_comparison(
         dlab, flab = "Data", "Fit"
     else:
         dlab, flab = None, None
-    datahist, _ = np.histogram(data, bins=bins, range=range)
+    datahist, _ = np.histogram(data, bins=bins, range=range, weights=dataweights)
     fithist1, edges = np.histogram(fit, bins=bins, range=range, weights=weights)
     fitscale = np.sum(datahist) / np.sum(fithist1)
     fithist = fithist1 * fitscale
@@ -404,7 +405,7 @@ def plot_distr_comparison(
 
 class MultidimDisplay:
     def __init__(
-        self, data, norm, bins, ranges, labels, fig, axes, units=None, cmap="jet"
+        self, data, norm, bins, ranges, labels, fig, axes, units=None, cmap="jet", dataweights=None
     ):
         self.dim = data.shape[1]
         self.data = data
@@ -420,6 +421,7 @@ class MultidimDisplay:
         self.first = True
         self.newaxes = []
         self.zrange = {}
+        self.dataweights=dataweights
         n = 0
         for i in range(self.dim):
             for j in range(i):
@@ -436,6 +438,7 @@ class MultidimDisplay:
                     ax=ax1,
                     labels=(labels[i], labels[j]),
                     cmap=cmap,
+                    weights=dataweights,
                     title="Data",
                 )
                 n += 1
@@ -443,6 +446,8 @@ class MultidimDisplay:
     def draw(self, weights):
 
         scale = float(self.size) / np.sum(weights)
+        if self.dataweights is not None:
+            scale = np.sum(self.dataweights) / np.sum(weights)
         for a in self.newaxes:
             a.remove()
         self.newaxes = []
@@ -457,6 +462,7 @@ class MultidimDisplay:
                 self.axes[0, i],
                 self.labels[i],
                 weights=scale * weights,
+                dataweights=self.dataweights,
                 pull=True,
                 data_alpha=0.3,
                 title = self.labels[i]
