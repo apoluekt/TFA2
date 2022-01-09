@@ -161,7 +161,7 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     results["func_calls"] = func.n
     results["grad_calls"] = gradient.n
     results["time"] = endtime - starttime
-    results["covariance"] = [(k, v) for k, v in minuit.covariance.items()]
+    #results["covariance"] = [(k, v) for k, v in minuit.covariance.items()]
     #is_valid == (has_valid_parameters & !has_reached_call_limit & !is_above_max_edm)
     results["is_valid"] = int(f_min.is_valid) 
     results["has_parameters_at_limit"] = int(f_min.has_parameters_at_limit)
@@ -238,7 +238,7 @@ def write_fit_results(pars, results, filename, store_covariance = False):
     f.write(s + "\n")
     f.close()
 
-    if store_covariance = True:
+    if store_covariance == True :
         covmatrix = results['covmatrix']
         fcov = open(filename.replace('.txt','_cov.txt'), "w")
         for k1 in list(covmatrix.keys()):
