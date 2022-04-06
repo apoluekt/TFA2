@@ -68,7 +68,7 @@ class FitParameter:
         return self.var.numpy()
 
 
-def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = False, get_covariance = False):
+def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = False, get_covariance = False, print_level = 0):
     """
     Run IMinuit to minimise NLL function
 
@@ -136,6 +136,8 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     if use_minos:
         minuit.minos()
 
+    minuit.print_level = print_level
+
     endtime = timer()
 
     par_states = minuit.params
@@ -143,7 +145,7 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     #print the nice tables of fit results
     print(f_min)
     print(par_states)
-    print(minuit.covariance.correlation())
+    if f_min.is_valid: print(minuit.covariance.correlation())
 
     results = {"params": {}}  # Get fit results and update parameters
     for n, p in enumerate(float_pars):
@@ -237,7 +239,7 @@ def write_fit_results(pars, results, filename, store_covariance = False):
     f.write(s + "\n")
     f.close()
 
-    if store_covariance = True:
+    if store_covariance:
         covmatrix = results['covmatrix']
         fcov = open(filename.replace('.txt','_cov.txt'), "w")
         for k1 in list(covmatrix.keys()):
