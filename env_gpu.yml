@@ -8,5 +8,5 @@ dependencies:
   - numpy
   - pandas
   - iminuit
-  - uproot
+  - uproot=3
   - matplotlib 
