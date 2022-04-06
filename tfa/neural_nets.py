@@ -185,12 +185,21 @@ def estimate_density(
         return -tf.reduce_sum(atfi.log(pdf/integral))
 
     @tf.function
+    def unbinned_weighted_nll(pdf, integral, w) : 
+        return -tf.reduce_sum(atfi.log(pdf/integral)*w)
+
+    @tf.function
     def integral(pdf) : 
         return tf.reduce_mean(pdf)
 
     opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
-    data_sample = phsp.filter(data)
+    data_inside = phsp.inside(data)
+    data_sample = data[data_inside]
+    if weight is not None : 
+        weight_sample = weight[data_inside]
+    else : 
+        weight_sample = None
 
     if isinstance(norm_size, int) : 
         norm_sample = phsp.uniform_sample(norm_size)
@@ -201,25 +210,44 @@ def estimate_density(
     print("Data sample size = ", len(data_sample))
     print(data_sample)
 
+    if weight_sample is None : 
+        @tf.function
+        def raw_nll() : 
+            return unbinned_nll(fitmodel(data_sample), integral(fitmodel(norm_sample)))
+    else : 
+        @tf.function
+        def raw_nll() : 
+            return unbinned_weighted_nll(fitmodel(data_sample), integral(fitmodel(norm_sample)), weight_sample)
+
     if model is None : 
         # Define loss and optimizer
         if regularisation is None : 
             @tf.function
             def nll() : 
-                return unbinned_nll(fitmodel(data_sample), integral(fitmodel(norm_sample))) + l2_regularisation(weights)*weight_penalty
+                return raw_nll() + l2_regularisation(weights)*weight_penalty
         else : 
             @tf.function
             def nll() : 
-                return unbinned_nll(fitmodel(data_sample), integral(fitmodel(norm_sample))) + regularisation(weights)
+                return raw_nll() + regularisation(weights)
     else : 
         @tf.function
         def nll() : 
-            return unbinned_nll(fitmodel(data_sample), integral(fitmodel(norm_sample)))
+            return raw_nll()
 
     # Training cycle
     best_cost = 1e10
 
-    display = atfp.MultidimDisplay(data_sample, norm_sample, bins, ranges, labels, fig, axes, units = units)
+    display = atfp.MultidimDisplay(
+        data_sample, 
+        norm_sample, 
+        bins, 
+        ranges, 
+        labels, 
+        fig, 
+        axes, 
+        units = units, 
+        data_weights = weight_sample
+    )
     plt.ion()
     plt.show()
     plt.pause(0.1)

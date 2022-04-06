@@ -283,6 +283,7 @@ def plot_distr1d_comparison(
     color=None,
     data_alpha=1.0,
     legend_ax=None,
+    data_weights=None
 ):
     """
     Plot 1D histogram and its fit result.
@@ -297,7 +298,7 @@ def plot_distr1d_comparison(
         dlab, flab = "Data", "Fit"
     else:
         dlab, flab = None, None
-    datahist, _ = np.histogram(data, bins=bins, range=range)
+    datahist, _ = np.histogram(data, bins=bins, range=range, weights=data_weights)
     fithist1, edges = np.histogram(fit, bins=bins, range=range, weights=weights)
     fitscale = np.sum(datahist) / np.sum(fithist1)
     fithist = fithist1 * fitscale
@@ -421,12 +422,13 @@ def plot_distr_comparison(
 
 class MultidimDisplay:
     def __init__(
-        self, data, norm, bins, ranges, labels, fig, axes, units=None, cmap="jet"
+        self, data, norm, bins, ranges, labels, fig, axes, units=None, cmap="jet", data_weights = None
     ):
         self.dim = data.shape[1]
         self.data = data
         self.norm = norm
         self.bins = bins
+        self.data_weights = data_weights
         self.ranges = ranges
         self.labels = labels
         self.fig = fig
@@ -454,12 +456,16 @@ class MultidimDisplay:
                     labels=(labels[i], labels[j]),
                     cmap=cmap,
                     title="Data",
+                    weights = data_weights
                 )
                 n += 1
 
     def draw(self, weights):
 
-        scale = float(self.size) / np.sum(weights)
+        if self.data_weights is None : 
+            scale = float(self.size) / np.sum(weights)
+        else : 
+            scale = np.sum(self.data_weights) / np.sum(weights)
         for a in self.newaxes:
             a.remove()
         self.newaxes = []
@@ -476,7 +482,8 @@ class MultidimDisplay:
                 weights=scale * weights,
                 pull=True,
                 data_alpha=0.3,
-                title = self.labels[i]
+                title = self.labels[i], 
+                data_weights = self.data_weights
             )
             self.newaxes += newax
 
