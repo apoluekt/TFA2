@@ -163,6 +163,7 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     results["func_calls"] = func.n
     results["grad_calls"] = gradient.n
     results["time"] = endtime - starttime
+    #results["covariance"] = [(k, v) for k, v in minuit.covariance.items()]
     #is_valid == (has_valid_parameters & !has_reached_call_limit & !is_above_max_edm)
     results["is_valid"] = int(f_min.is_valid) 
     results["has_parameters_at_limit"] = int(f_min.has_parameters_at_limit)
