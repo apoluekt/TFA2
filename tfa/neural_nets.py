@@ -93,7 +93,7 @@ def init_fixed_weights_biases(init):
 
 def normalise(array, ranges):
     v = [
-        (array[:, i] - ranges[i][0]) / (ranges[i][1] - ranges[i][0])
+        (array[:, i] - atfi.const(ranges[i][0])) / (atfi.const(ranges[i][1]) - atfi.const(ranges[i][0]))
         for i in range(len(ranges))
     ]
     return tf.stack(v, axis=1)
@@ -195,7 +195,7 @@ def estimate_density(
     opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
     data_inside = phsp.inside(data)
-    data_sample = data[data_inside]
+    data_sample = atfi.cast_real(data[data_inside])
     if weight is not None : 
         weight_sample = weight[data_inside]
     else : 
