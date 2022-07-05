@@ -113,6 +113,8 @@ pars = [
 result = tfo.run_minuit(nll(toy_sample, norm_sample), pars)
 print(result)
 
+cov = result['covariance']
+
 print(f"{result['time']/result['func_calls']} sec per function call")
 
 fitted_pars = {p: atfi.const(v[0]) for p, v in result["params"].items()}

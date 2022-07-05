@@ -278,12 +278,13 @@ def plot_distr1d_comparison(
     weights=None,
     pull=False,
     cweights=None,
+    dataweights=None,
     title=None,
     legend=None,
     color=None,
     data_alpha=1.0,
     legend_ax=None,
-    data_weights=None
+    scale=None, 
 ):
     """
     Plot 1D histogram and its fit result.
@@ -295,12 +296,19 @@ def plot_distr1d_comparison(
       units : Units for x axis
     """
     if not legend == False:
-        dlab, flab = "Data", "Fit"
+        if legend == None : 
+          dlab, flab = "Data", "Fit"
+        elif cweights is None and len(legend) == 2 : 
+          dlab, flab = legend
+        elif (cweights is not None) and (len(legend) == len(cweights)+2) : 
+          dlab, flab = legend[-2:]
+        else : 
+          dlab, flab = "Data", "Fit"
     else:
         dlab, flab = None, None
-    datahist, _ = np.histogram(data, bins=bins, range=range, weights=data_weights)
+    datahist, _ = np.histogram(data, bins=bins, range=range, weights=dataweights)
     fithist1, edges = np.histogram(fit, bins=bins, range=range, weights=weights)
-    fitscale = np.sum(datahist) / np.sum(fithist1)
+    fitscale = scale if scale is not None else np.sum(datahist) / np.sum(fithist1) 
     fithist = fithist1 * fitscale
     left, right = edges[:-1], edges[1:]
     fitarr = np.array([fithist, fithist]).T.flatten()
@@ -311,7 +319,7 @@ def plot_distr1d_comparison(
     if isinstance(cweights, list):
         cxarr = None
         for i, w in enumerate(cweights):
-            if weights:
+            if weights is not None :
                 w2 = w * weights
             else:
                 w2 = w
@@ -422,7 +430,7 @@ def plot_distr_comparison(
 
 class MultidimDisplay:
     def __init__(
-        self, data, norm, bins, ranges, labels, fig, axes, units=None, cmap="jet", data_weights = None
+        self, data, norm, bins, ranges, labels, fig, axes, units=None, cmap="jet", dataweights=None
     ):
         self.dim = data.shape[1]
         self.data = data
@@ -439,6 +447,7 @@ class MultidimDisplay:
         self.first = True
         self.newaxes = []
         self.zrange = {}
+        self.dataweights=dataweights
         n = 0
         for i in range(self.dim):
             for j in range(i):
@@ -455,6 +464,7 @@ class MultidimDisplay:
                     ax=ax1,
                     labels=(labels[i], labels[j]),
                     cmap=cmap,
+                    weights=dataweights,
                     title="Data",
                     weights = data_weights
                 )
@@ -462,10 +472,9 @@ class MultidimDisplay:
 
     def draw(self, weights):
 
-        if self.data_weights is None : 
-            scale = float(self.size) / np.sum(weights)
-        else : 
-            scale = np.sum(self.data_weights) / np.sum(weights)
+        scale = float(self.size) / np.sum(weights)
+        if self.dataweights is not None:
+            scale = np.sum(self.dataweights) / np.sum(weights)
         for a in self.newaxes:
             a.remove()
         self.newaxes = []
@@ -480,6 +489,7 @@ class MultidimDisplay:
                 self.axes[0, i],
                 self.labels[i],
                 weights=scale * weights,
+                dataweights=self.dataweights,
                 pull=True,
                 data_alpha=0.3,
                 title = self.labels[i], 

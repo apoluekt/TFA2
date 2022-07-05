@@ -8,5 +8,6 @@ dependencies:
   - numpy
   - pandas
   - iminuit
-  - uproot=3
-  - matplotlib 
+  - uproot
+  - matplotlib
+  - bioconda::snakemake==7.2.1
