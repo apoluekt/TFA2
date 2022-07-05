@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import os
+from contextlib import contextmanager
 
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter, AutoMinorLocator
 
@@ -10,6 +11,17 @@ fit_color = "xkcd:azure"
 sig_color = "xkcd:coral"
 bck_color = "xkcd:teal"
 diff_color = "xkcd:red"
+
+@contextmanager
+def plot(name, prefix) : 
+    """
+    Helper context to open matplotlib canvas and then save it to pdf and png files
+    """
+    fig, ax = plt.subplots(figsize = (4, 3) )
+    fig.subplots_adjust(bottom=0.15, left = 0.20, right = 0.95, top = 0.98)
+    yield fig, ax
+    fig.savefig(prefix + name + ".pdf")
+    fig.savefig(prefix + name + ".png")
 
 
 def set_lhcb_style(grid=True, size=10, usetex="auto", font="serif"):
@@ -468,8 +480,7 @@ class MultidimDisplay:
                     labels=(labels[i], labels[j]),
                     cmap=cmap,
                     weights=dataweights,
-                    title="Data",
-                    weights = data_weights
+                    title="Data"
                 )
                 n += 1
 
@@ -495,8 +506,7 @@ class MultidimDisplay:
                 dataweights=self.dataweights,
                 pull=True,
                 data_alpha=0.3,
-                title = self.labels[i], 
-                data_weights = self.data_weights
+                title = self.labels[i]
             )
             self.newaxes += newax
 
