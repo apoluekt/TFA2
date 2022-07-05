@@ -105,13 +105,16 @@ def plot_distr2d(
             & (vals[1] >= ranges[1][0])
             & (vals[1] < ranges[1][1])
         )
+        w = weights
+        if w is not None :
+            w = w[cuts]
         c = (
             (vals[0][cuts] - ranges[0][0]) / (ranges[0][1] - ranges[0][0]) * bins[0]
         ).astype(np.int_)
         c += bins[0] * (
             (vals[1][cuts] - ranges[1][0]) / (ranges[1][1] - ranges[1][0]) * bins[1]
         ).astype(np.int_)
-        H = np.bincount(c, minlength=bins[0] * bins[1], weights=weights)[
+        H = np.bincount(c, minlength=bins[0] * bins[1], weights=w)[
             : bins[0] * bins[1]
         ].reshape(bins[1], bins[0])
         return (
