@@ -25,19 +25,20 @@ import tensorflow as tf
 
 import sys, os
 
-sys.path.append("../")
+#sys.path.append("../")
 # os.environ["CUDA_VISIBLE_DEVICES"] = ""   # Do not use GPU
 
 import amplitf.interface as atfi
 import amplitf.kinematics as atfk
 import amplitf.dynamics as atfd
-import amplitf.toymc as tft
 import amplitf.likelihood as atfl
-import amplitf.optimisation as atfo
 from amplitf.phasespace.dalitz_phasespace import DalitzPhaseSpace
 
 # Import TFA modules
 import tfa.toymc as tft
+import tfa.plotting as tfp
+import tfa.optimisation as tfo
+
 
 # Calculate orbital momentum for a decay of a particle
 # of a given spin and parity to a proton (J^p=1/2+) and a pseudoscalar.
@@ -104,84 +105,84 @@ if __name__ == "__main__":
     dr = atfi.const(1.5)
 
     # Slope parameters for exponential nonresonant amplitudes
-    alpha12p = atfo.FitParameter("alpha12p", 2.3, 0.0, 10.0, 0.01)
-    alpha12m = atfo.FitParameter("alpha12m", 1.0, 0.0, 10.0, 0.01)
-    alpha32p = atfo.FitParameter("alpha32p", 2.5, 0.0, 10.0, 0.01)
-    alpha32m = atfo.FitParameter("alpha32m", 2.6, 0.0, 10.0, 0.01)
+    alpha12p = tfo.FitParameter("alpha12p", 2.3, 0.0, 10.0, 0.01)
+    alpha12m = tfo.FitParameter("alpha12m", 1.0, 0.0, 10.0, 0.01)
+    alpha32p = tfo.FitParameter("alpha32p", 2.5, 0.0, 10.0, 0.01)
+    alpha32m = tfo.FitParameter("alpha32m", 2.6, 0.0, 10.0, 0.01)
 
     # List of complex couplings
     couplings = [
         ((atfi.const(1.0), atfi.const(0.0)), (atfi.const(0.0), atfi.const(0.0))),
         (
             (
-                atfo.FitParameter("ArX1", -0.38, -10.0, 10.0, 0.01),
-                atfo.FitParameter("AiX1", 0.86, -10.0, 10.0, 0.01),
+                tfo.FitParameter("ArX1", -0.38, -10.0, 10.0, 0.01),
+                tfo.FitParameter("AiX1", 0.86, -10.0, 10.0, 0.01),
             ),
             (
-                atfo.FitParameter("ArX2", 6.59, -10.0, 10.0, 0.01),
-                atfo.FitParameter("AiX2", -0.38, -10.0, 10.0, 0.01),
-            ),
-        ),
-        (
-            (
-                atfo.FitParameter("Ar29401", 0.53, -10.0, 10.0, 0.01),
-                atfo.FitParameter("Ai29401", 0.14, -10.0, 10.0, 0.01),
-            ),
-            (
-                atfo.FitParameter("Ar29402", -1.24, -10.0, 10.0, 0.01),
-                atfo.FitParameter("Ai29402", 0.02, -10.0, 10.0, 0.01),
+                tfo.FitParameter("ArX2", 6.59, -10.0, 10.0, 0.01),
+                tfo.FitParameter("AiX2", -0.38, -10.0, 10.0, 0.01),
             ),
         ),
         (
             (
-                atfo.FitParameter("Ar12p1", 0.05, -10.0, 10.0, 0.01),
-                atfo.FitParameter("Ai12p1", 0.23, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ar29401", 0.53, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ai29401", 0.14, -10.0, 10.0, 0.01),
             ),
             (
-                atfo.FitParameter("Ar12p2", -0.16, -10.0, 10.0, 0.01),
-                atfo.FitParameter("Ai12p2", -2.86, -10.0, 10.0, 0.01),
-            ),
-        ),
-        (
-            (
-                atfo.FitParameter("Ar12m1", 1.17, -10.0, 10.0, 0.01),
-                atfo.FitParameter("Ai12m1", 0.76, -10.0, 10.0, 0.01),
-            ),
-            (
-                atfo.FitParameter("Ar12m2", -2.55, -10.0, 10.0, 0.01),
-                atfo.FitParameter("Ai12m2", 3.86, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ar29402", -1.24, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ai29402", 0.02, -10.0, 10.0, 0.01),
             ),
         ),
         (
             (
-                atfo.FitParameter("Ar32p1", 0.0, -100.0, 100.0, 0.01),
-                atfo.FitParameter("Ai32p1", 0.0, -100.0, 100.0, 0.01),
+                tfo.FitParameter("Ar12p1", 0.05, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ai12p1", 0.23, -10.0, 10.0, 0.01),
             ),
             (
-                atfo.FitParameter("Ar32p2", 0.0, -100.0, 100.0, 0.01),
-                atfo.FitParameter("Ai32p2", 0.0, -100.0, 100.0, 0.01),
+                tfo.FitParameter("Ar12p2", -0.16, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ai12p2", -2.86, -10.0, 10.0, 0.01),
             ),
         ),
         (
             (
-                atfo.FitParameter("Ar32m1", 0.95, -10.0, 10.0, 0.01),
-                atfo.FitParameter("Ai32m1", -0.45, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ar12m1", 1.17, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ai12m1", 0.76, -10.0, 10.0, 0.01),
             ),
             (
-                atfo.FitParameter("Ar32m2", -2.27, -10.0, 10.0, 0.01),
-                atfo.FitParameter("Ai32m2", 0.95, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ar12m2", -2.55, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ai12m2", 3.86, -10.0, 10.0, 0.01),
+            ),
+        ),
+        (
+            (
+                tfo.FitParameter("Ar32p1", 0.0, -100.0, 100.0, 0.01),
+                tfo.FitParameter("Ai32p1", 0.0, -100.0, 100.0, 0.01),
+            ),
+            (
+                tfo.FitParameter("Ar32p2", 0.0, -100.0, 100.0, 0.01),
+                tfo.FitParameter("Ai32p2", 0.0, -100.0, 100.0, 0.01),
+            ),
+        ),
+        (
+            (
+                tfo.FitParameter("Ar32m1", 0.95, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ai32m1", -0.45, -10.0, 10.0, 0.01),
+            ),
+            (
+                tfo.FitParameter("Ar32m2", -2.27, -10.0, 10.0, 0.01),
+                tfo.FitParameter("Ai32m2", 0.95, -10.0, 10.0, 0.01),
             ),
         ),
     ]
 
     pars = [alpha12p, alpha12m, alpha32p, alpha32m] + [
-        k for i in couplings for j in i for k in j if isinstance(k, atfo.FitParameter)
+        k for i in couplings for j in i for k in j if isinstance(k, tfo.FitParameter)
     ]
 
     # Model description
 
     @atfi.function
-    def model(x):
+    def model(x, pars):
 
         m2dp = phsp.m2ab(x)
         m2ppi = phsp.m2bc(x)
@@ -209,8 +210,8 @@ if __name__ == "__main__":
                 ),
                 5,
                 1,
-                couplings[0][0],
-                couplings[0][1],
+                (1., 0.),
+                (0., 0.)
             ),
             (
                 atfd.breit_wigner_lineshape(
@@ -228,8 +229,8 @@ if __name__ == "__main__":
                 ),
                 3,
                 1,
-                couplings[1][0],
-                couplings[1][1],
+                (pars["ArX1"], pars["AiX1"]),
+                (pars["ArX2"], pars["AiX2"]),
             ),
             (
                 atfd.breit_wigner_lineshape(
@@ -247,44 +248,44 @@ if __name__ == "__main__":
                 ),
                 3,
                 -1,
-                couplings[2][0],
-                couplings[2][1],
+                (pars["Ar29401"], pars["Ai29401"]),
+                (pars["Ar29402"], pars["Ai29402"]),
             ),
             (
                 atfd.exponential_nonresonant_lineshape(
-                    m2dp, mass0, alpha12p, md, mp, mpi, mlb, OrbitalMomentum(1, 1), 0
+                    m2dp, mass0, pars["alpha12p"], md, mp, mpi, mlb, OrbitalMomentum(1, 1), 0
                 ),
                 1,
                 1,
-                couplings[3][0],
-                couplings[3][1],
+                (pars["Ar12p1"], pars["Ai12p1"]),
+                (pars["Ar12p2"], pars["Ai12p2"]),
             ),
             (
                 atfd.exponential_nonresonant_lineshape(
-                    m2dp, mass0, alpha12m, md, mp, mpi, mlb, OrbitalMomentum(1, -1), 0
+                    m2dp, mass0, pars["alpha12m"], md, mp, mpi, mlb, OrbitalMomentum(1, -1), 0
                 ),
                 1,
                 -1,
-                couplings[4][0],
-                couplings[4][1],
+                (pars["Ar12m1"], pars["Ai12m1"]),
+                (pars["Ar12m2"], pars["Ai12m2"]),
             ),
             (
                 atfd.exponential_nonresonant_lineshape(
-                    m2dp, mass0, alpha32p, md, mp, mpi, mlb, OrbitalMomentum(3, 1), 1
+                    m2dp, mass0, pars["alpha32p"], md, mp, mpi, mlb, OrbitalMomentum(3, 1), 1
                 ),
                 3,
                 1,
-                couplings[5][0],
-                couplings[5][1],
+                (pars["Ar32p1"], pars["Ai32p1"]),
+                (pars["Ar32p2"], pars["Ai32p2"]),
             ),
             (
                 atfd.exponential_nonresonant_lineshape(
-                    m2dp, mass0, alpha32m, md, mp, mpi, mlb, OrbitalMomentum(3, -1), 1
+                    m2dp, mass0, pars["alpha32m"], md, mp, mpi, mlb, OrbitalMomentum(3, -1), 1
                 ),
                 3,
                 -1,
-                couplings[6][0],
-                couplings[6][1],
+                (pars["Ar32m1"], pars["Ai32m1"]),
+                (pars["Ar32m2"], pars["Ai32m2"]),
             ),
         ]
 
@@ -303,11 +304,11 @@ if __name__ == "__main__":
                     parity = r[2]
                     if pol_p == -1:
                         sign = CouplingSign(spin, parity)
-                        coupling1 = atfi.complex(r[3][0], r[3][1]) * sign
-                        coupling2 = atfi.complex(r[4][0], r[4][1]) * sign
+                        coupling1 = atfi.complex(atfi.const(r[3][0]), atfi.const(r[3][1])) * sign
+                        coupling2 = atfi.complex(atfi.const(r[4][0]), atfi.const(r[4][1])) * sign
                     else:
-                        coupling1 = atfi.complex(r[3][0], r[3][1])
-                        coupling2 = atfi.complex(r[4][0], r[4][1])
+                        coupling1 = atfi.complex(atfi.const(r[3][0]), atfi.const(r[3][1]))
+                        coupling2 = atfi.complex(atfi.const(r[4][0]), atfi.const(r[4][1]))
                     ampl += (
                         coupling1
                         * lineshape
@@ -342,9 +343,12 @@ if __name__ == "__main__":
                             0,
                         )
                     )
-                density += atfi.density(ampl)
+                density += atfd.density(ampl)
 
         return density
+
+    def toy_model(x) : 
+      return model(x, {p.name : p.init_value for p in pars} )
 
     atfi.set_seed(2)
 
@@ -353,19 +357,19 @@ if __name__ == "__main__":
     print("Normalisation sample size = ", norm_sample.shape)
     print(norm_sample)
 
-    # Calculate maximum of the PDF for accept-reject toy MC generation
-    maximum = tft.maximum_estimator(model, phsp, 100000) * 1.5
-    print("Maximum = ", maximum)
-
     # Create toy MC data sample
-    data_sample = tft.run_toymc(model, phsp, toy_sample, maximum, chunk=1000000)
+    data_sample = tft.run_toymc(toy_model, phsp, toy_sample, 0., chunk=1000000)
     print(data_sample)
 
-    @atfi.function
     def nll(data, norm):
-        return atfl.unbinned_nll(model(data), atfl.integral(model(norm)))
+        @atfi.function
+        def _nll(pars):
+            return atfl.unbinned_nll(
+                model(data, pars), atfl.integral(model(norm, pars))
+            )
+        return _nll
 
-    result = atfo.run_minuit(nll, pars, args=(data_sample, norm_sample))
+    result = tfo.run_minuit(nll(data_sample, norm_sample), pars)
 
     # Store fit result in a text file
     print(result)

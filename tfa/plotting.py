@@ -283,7 +283,7 @@ def plot_distr1d_comparison(
           dlab, flab = "Data", "Fit"
         elif cweights is None and len(legend) == 2 : 
           dlab, flab = legend
-        elif (cweights is not None) and (len(legend) == len(weights)+2) : 
+        elif (cweights is not None) and (len(legend) == len(cweights)+2) : 
           dlab, flab = legend[-2:]
         else : 
           dlab, flab = "Data", "Fit"

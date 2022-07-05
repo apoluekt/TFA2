@@ -1,5 +1,6 @@
 import uproot
 import numpy as np
+import amplitf.interface as atfi
 
 
 def write_tuple(rootfile, array, branches, tree="tree"):
@@ -13,21 +14,22 @@ def write_tuple(rootfile, array, branches, tree="tree"):
       tree : name of the tree
     All branches are of double precision
     """
-    with uproot.recreate(rootfile, compression=uproot.ZLIB(4)) as file:
-        file[tree] = uproot.newtree({b: "float64" for b in branches})
-        d = {b: array[:, i] for i, b in enumerate(branches)}
-        # print(d)
-        file[tree].extend(d)
+    #with uproot.recreate(rootfile, compression=uproot.ZLIB(4)) as file:
+    #    file[tree] = uproot.newtree({b: "float64" for b in branches})
+    #    d = {b: array[:, i] for i, b in enumerate(branches)}
+    #    # print(d)
+    #    file[tree].extend(d)
+    with uproot.recreate(rootfile, compression=uproot.ZLIB(4)) as file :
+        file[tree] = {b: array[:, i] for i, b in enumerate(branches)}
 
 
 def read_tuple(rootfile, branches, tree="tree"):
     """
     Load the contents of the tree from the ROOT file into numpy array.
     """
-    with uproot.open(rootfile) as file:
-        t = file[tree]
-        a = [t.array(b) for b in branches]
-    return np.stack(a, axis=1)
+    with uproot.open(f"{rootfile}:{tree}") as t:
+        a = [t[b].array(library="np") for b in branches]
+    return atfi.const(np.stack(a, axis=1))
 
 
 def read_tuple_filtered(
@@ -38,14 +40,13 @@ def read_tuple_filtered(
     applying the selection to each entry.
     """
     arrays = []
-    with uproot.open(rootfile) as file:
-        t = file[tree]
+    with uproot.open(f"{rootfile}:{tree}") as t:
         if branches is None:
             read_branches = store_branches = t.keys()
         else:
             read_branches = branches + sel_branches
             store_branches = branches
-        for data in t.pandas.iterate(branches=read_branches):
+        for data in t.iterate(branches=read_branches, library="pd"):
             if selection:
                 df = data.query(selection)
             else:

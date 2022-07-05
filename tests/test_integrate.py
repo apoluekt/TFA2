@@ -1,14 +1,9 @@
 import sys, math
 import tensorflow as tf
 
-sys.path.append("../")
-
 import amplitf.interface as atfi
 
-atfi.backend_tf()
-
 npoints = 100000000
-
 
 @atfi.function
 def func(x):
