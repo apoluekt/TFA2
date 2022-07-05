@@ -168,6 +168,10 @@ def plot_distr1d(
     color=None,
     legend=None,
     errors=False,
+    normalise=False, 
+    fill=True, 
+    line=False, 
+    legend_ax=None, 
 ):
     """
     Plot 1D histogram from the data in array.
@@ -203,10 +207,18 @@ def plot_distr1d(
         xarr = None
         for i, a in enumerate(arr):
             hist, edges = np.histogram(a, bins=bins, range=range, weights=weights)
+            if normalise : 
+                hist = hist.astype(np.float64)*float(bins)/np.sum(hist)/(range[1]-range[0])
             if xarr is None:
                 left, right = edges[:-1], edges[1:]
-                xarr = np.array([left, right]).T.flatten()
-            dataarr = np.array([hist, hist]).T.flatten()
+                if line : 
+                    xarr = (left+right)/2.
+                else : 
+                    xarr = np.array([left, right]).T.flatten()
+            if line : 
+                dataarr = hist
+            else : 
+                dataarr = np.array([hist, hist]).T.flatten()
             if color:
                 this_color = color[i]
             else:
@@ -216,7 +228,7 @@ def plot_distr1d(
             else:
                 lab = None
             ax.plot(xarr, dataarr, color=this_color, label=lab)
-            ax.fill_between(xarr, dataarr, 0.0, color=this_color, alpha=0.1)
+            if fill : ax.fill_between(xarr, dataarr, 0.0, color=this_color, alpha=0.1)
     else:
         if color:
             this_color = color
@@ -246,7 +258,12 @@ def plot_distr1d(
     elif title:
         ax.set_title(title)
     if legend:
-        ax.legend(loc="best")
+        if legend_ax:
+            h, l = ax.get_legend_handles_labels()
+            legend_ax.legend(h, l, borderaxespad=0)
+            legend_ax.axis("off")
+        else:
+            ax.legend(loc="best")
 
 
 def plot_distr1d_comparison(
@@ -419,6 +436,7 @@ class MultidimDisplay:
         self.data = data
         self.norm = norm
         self.bins = bins
+        self.data_weights = data_weights
         self.ranges = ranges
         self.labels = labels
         self.fig = fig
@@ -448,6 +466,7 @@ class MultidimDisplay:
                     cmap=cmap,
                     weights=dataweights,
                     title="Data",
+                    weights = data_weights
                 )
                 n += 1
 
@@ -473,7 +492,8 @@ class MultidimDisplay:
                 dataweights=self.dataweights,
                 pull=True,
                 data_alpha=0.3,
-                title = self.labels[i]
+                title = self.labels[i], 
+                data_weights = self.data_weights
             )
             self.newaxes += newax
 
