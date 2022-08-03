@@ -448,7 +448,7 @@ class MultidimDisplay:
         self.data = data
         self.norm = norm
         self.bins = bins
-        self.data_weights = data_weights
+        self.dataweights = dataweights
         self.ranges = ranges
         self.labels = labels
         self.fig = fig
@@ -459,7 +459,6 @@ class MultidimDisplay:
         self.first = True
         self.newaxes = []
         self.zrange = {}
-        self.dataweights=dataweights
         n = 0
         for i in range(self.dim):
             for j in range(i):

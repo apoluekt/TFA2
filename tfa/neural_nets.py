@@ -246,7 +246,7 @@ def estimate_density(
         fig, 
         axes, 
         units = units, 
-        data_weights = weight_sample
+        dataweights = weight_sample
     )
     plt.ion()
     plt.show()
