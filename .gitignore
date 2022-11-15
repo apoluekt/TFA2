@@ -19,3 +19,4 @@ htmlcov/
 # Visual Studio Code
 .vscode/
 *.code-workspace
+dist/tfa2-0.0.1-py3.10.egg
