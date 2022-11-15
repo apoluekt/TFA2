@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import os
+from contextlib import contextmanager
 
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter, AutoMinorLocator
 
@@ -10,6 +11,17 @@ fit_color = "xkcd:azure"
 sig_color = "xkcd:coral"
 bck_color = "xkcd:teal"
 diff_color = "xkcd:red"
+
+@contextmanager
+def plot(name, prefix) : 
+    """
+    Helper context to open matplotlib canvas and then save it to pdf and png files
+    """
+    fig, ax = plt.subplots(figsize = (4, 3) )
+    fig.subplots_adjust(bottom=0.15, left = 0.20, right = 0.95, top = 0.98)
+    yield fig, ax
+    fig.savefig(prefix + name + ".pdf")
+    fig.savefig(prefix + name + ".png")
 
 
 def set_lhcb_style(grid=True, size=10, usetex="auto", font="serif"):
@@ -105,13 +117,16 @@ def plot_distr2d(
             & (vals[1] >= ranges[1][0])
             & (vals[1] < ranges[1][1])
         )
+        w = weights
+        if w is not None :
+            w = w[cuts]
         c = (
             (vals[0][cuts] - ranges[0][0]) / (ranges[0][1] - ranges[0][0]) * bins[0]
         ).astype(np.int_)
         c += bins[0] * (
             (vals[1][cuts] - ranges[1][0]) / (ranges[1][1] - ranges[1][0]) * bins[1]
         ).astype(np.int_)
-        H = np.bincount(c, minlength=bins[0] * bins[1], weights=weights)[
+        H = np.bincount(c, minlength=bins[0] * bins[1], weights=w)[
             : bins[0] * bins[1]
         ].reshape(bins[1], bins[0])
         return (
@@ -278,11 +293,13 @@ def plot_distr1d_comparison(
     weights=None,
     pull=False,
     cweights=None,
+    dataweights=None,
     title=None,
     legend=None,
     color=None,
     data_alpha=1.0,
     legend_ax=None,
+    scale=None, 
 ):
     """
     Plot 1D histogram and its fit result.
@@ -294,12 +311,19 @@ def plot_distr1d_comparison(
       units : Units for x axis
     """
     if not legend == False:
-        dlab, flab = "Data", "Fit"
+        if legend == None : 
+          dlab, flab = "Data", "Fit"
+        elif cweights is None and len(legend) == 2 : 
+          dlab, flab = legend
+        elif (cweights is not None) and (len(legend) == len(cweights)+2) : 
+          dlab, flab = legend[-2:]
+        else : 
+          dlab, flab = "Data", "Fit"
     else:
         dlab, flab = None, None
-    datahist, _ = np.histogram(data, bins=bins, range=range)
+    datahist, _ = np.histogram(data, bins=bins, range=range, weights=dataweights)
     fithist1, edges = np.histogram(fit, bins=bins, range=range, weights=weights)
-    fitscale = np.sum(datahist) / np.sum(fithist1)
+    fitscale = scale if scale is not None else np.sum(datahist) / np.sum(fithist1) 
     fithist = fithist1 * fitscale
     left, right = edges[:-1], edges[1:]
     fitarr = np.array([fithist, fithist]).T.flatten()
@@ -310,7 +334,7 @@ def plot_distr1d_comparison(
     if isinstance(cweights, list):
         cxarr = None
         for i, w in enumerate(cweights):
-            if weights:
+            if weights is not None :
                 w2 = w * weights
             else:
                 w2 = w
@@ -421,12 +445,13 @@ def plot_distr_comparison(
 
 class MultidimDisplay:
     def __init__(
-        self, data, norm, bins, ranges, labels, fig, axes, units=None, cmap="jet"
+        self, data, norm, bins, ranges, labels, fig, axes, units=None, cmap="jet", dataweights=None
     ):
         self.dim = data.shape[1]
         self.data = data
         self.norm = norm
         self.bins = bins
+        self.dataweights = dataweights
         self.ranges = ranges
         self.labels = labels
         self.fig = fig
@@ -453,13 +478,16 @@ class MultidimDisplay:
                     ax=ax1,
                     labels=(labels[i], labels[j]),
                     cmap=cmap,
-                    title="Data",
+                    weights=dataweights,
+                    title="Data"
                 )
                 n += 1
 
     def draw(self, weights):
 
         scale = float(self.size) / np.sum(weights)
+        if self.dataweights is not None:
+            scale = np.sum(self.dataweights) / np.sum(weights)
         for a in self.newaxes:
             a.remove()
         self.newaxes = []
@@ -474,6 +502,7 @@ class MultidimDisplay:
                 self.axes[0, i],
                 self.labels[i],
                 weights=scale * weights,
+                dataweights=self.dataweights,
                 pull=True,
                 data_alpha=0.3,
                 title = self.labels[i]

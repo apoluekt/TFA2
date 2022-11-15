@@ -68,7 +68,7 @@ class FitParameter:
         return self.var.numpy()
 
 
-def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = False, get_covariance = False, print_level = 0):
+def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = False, get_covariance = False, print_level = 0, ncall = None):
     """
     Run IMinuit to minimise NLL function
 
@@ -129,7 +129,7 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
 
     initlh = func(start)
     starttime = timer()
-    minuit.migrad()
+    minuit.migrad(ncall = ncall)
     if use_hesse:
         minuit.hesse()
 
@@ -171,17 +171,7 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     results["has_posdef_covar"] = int(f_min.has_posdef_covar)
     results["has_made_posdef_covar"] = int(f_min.has_made_posdef_covar)
     results["has_reached_call_limit"] = int(f_min.has_reached_call_limit)
-
-    #store covariance matrix of parameters
-    if get_covariance:
-        covarmatrix = {}
-        for p1 in float_pars:
-            covarmatrix[p1.name] = {}
-            for p2 in float_pars:
-                covarmatrix[p1.name][p2.name] = minuit.covariance[p1.name, p2.name]
-
-        results["covmatrix"] = covarmatrix
-
+    if minuit.covariance is not None : results["covariance"] = minuit.covariance.to_table()
     return results
 
 
