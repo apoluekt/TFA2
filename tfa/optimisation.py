@@ -68,7 +68,7 @@ class FitParameter:
         return self.var.numpy()
 
 
-def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = False, get_covariance = False, print_level = 0, ncall = None):
+def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = False, get_covariance = False, print_level = 0, ncall = None, use_chisq = False):
     """
     Run IMinuit to minimise NLL function
 
@@ -78,6 +78,7 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     use_hesse : if True, uses HESSE for error estimation
     use_minos : if True, use MINOS for asymmetric error estimation
     get_covariance: if True, get the covariance matrix from the fit
+    use_chisq : if True, the error definition is set to Minuit.LEAST_SQUARES (1) else Minuit.LIKELIHOOD (0.5)
 
     returns the dictionary with the values and errors of the fit parameters
     """
@@ -123,7 +124,10 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     else:
         minuit = Minuit(func,start,name=name)
 
-    minuit.errordef=Minuit.LIKELIHOOD
+    if use_chisq:
+      minuit.errordef=Minuit.LEAST_SQUARES
+    else:
+      minuit.errordef=Minuit.LIKELIHOOD
     minuit.errors = error
     minuit.limits = limit
 
