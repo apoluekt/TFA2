@@ -230,9 +230,15 @@ def estimate_density(
             def nll() : 
                 return raw_nll() + regularisation(weights)
     else : 
-        @tf.function
-        def nll() : 
-            return raw_nll()
+        if regularisation is None : 
+            @tf.function
+            def nll() : 
+                return raw_nll()
+        else : 
+            @tf.function
+            def nll() : 
+                return raw_nll() + regularisation()
+
 
     # Training cycle
     best_cost = 1e10
@@ -275,7 +281,7 @@ def estimate_density(
                     biases =  [b.numpy() for b in parameters[1]]
                     np.save(outfile, [ scale, transform_ranges, weights, biases] )
                 else : 
-                    np.save(outfile, [ scale, transform_ranges] + [p.numpy() for p in parameters() ] )
+                    np.save(outfile, [ scale, transform_ranges] + [p.numpy() for p in parameters ] )
                 f = open(outfile + ".txt", "w")
                 f.write(s + "\n")
                 f.close()

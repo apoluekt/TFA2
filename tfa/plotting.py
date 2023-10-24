@@ -117,13 +117,15 @@ def plot_distr2d(
             & (vals[1] >= ranges[1][0])
             & (vals[1] < ranges[1][1])
         )
+        if weights is None : _weights = None
+        else : _weights = weights[cuts]
         c = (
             (vals[0][cuts] - ranges[0][0]) / (ranges[0][1] - ranges[0][0]) * bins[0]
         ).astype(np.int_)
         c += bins[0] * (
             (vals[1][cuts] - ranges[1][0]) / (ranges[1][1] - ranges[1][0]) * bins[1]
         ).astype(np.int_)
-        H = np.bincount(c, minlength=bins[0] * bins[1], weights=weights)[
+        H = np.bincount(c, minlength=bins[0] * bins[1], weights=_weights)[
             : bins[0] * bins[1]
         ].reshape(bins[1], bins[0])
         return (
@@ -251,9 +253,10 @@ def plot_distr1d(
         xarr = np.array([left, right]).T.flatten()
         dataarr = np.array([hist, hist]).T.flatten()
         if errors:
+            hist2, _ = np.histogram(arr, bins=bins, range=range, weights= None if weights is None else weights**2)
             xarr = (left + right) / 2.0
             ax.errorbar(
-                xarr, hist, np.sqrt(hist), color=this_color, marker=".", linestyle=""
+                xarr, hist, np.sqrt(hist2), color=this_color, marker=".", linestyle=""
             )
         else:
             ax.plot(xarr, dataarr, color=this_color)
@@ -352,10 +355,11 @@ def plot_distr1d_comparison(
             ax.fill_between(cxarr, fitarr, 0.0, color=this_color, alpha=0.1)
 
     xarr = (left + right) / 2.0
+    datahist2, _ = np.histogram(data, bins=bins, range=range, weights = None if dataweights is None else dataweights**2)
     ax.errorbar(
         xarr,
         datahist,
-        np.sqrt(datahist),
+        np.sqrt(datahist2),
         label=dlab,
         color=data_color,
         marker=".",
