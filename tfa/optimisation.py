@@ -68,7 +68,7 @@ class FitParameter:
         return self.var.numpy()
 
 
-def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = False, get_covariance = False, print_level = 0, ncall = None, use_chisq = False):
+def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = False, get_covariance = False, print_level = 0, ncall = None, errordef = Minuit.LIKELIHOOD):
     """
     Run IMinuit to minimise NLL function
 
@@ -78,7 +78,7 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     use_hesse : if True, uses HESSE for error estimation
     use_minos : if True, use MINOS for asymmetric error estimation
     get_covariance: if True, get the covariance matrix from the fit
-    use_chisq : if True, the error definition is set to Minuit.LEAST_SQUARES (1) else Minuit.LIKELIHOOD (0.5)
+    errordef : error definition for the fit. Default is 0.5 for chi2 and 1 for likelihood
 
     returns the dictionary with the values and errors of the fit parameters
     """
@@ -92,8 +92,9 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
         kwargs = {p.name: p() for p in float_pars + fixed_pars}
         func.n += 1
         nll_val = nll(kwargs).numpy()
-        if func.n % 10 == 0:
-            print(func.n, nll_val, par)
+        if print_level >= 0:
+          if func.n % 10 == 0:
+              print(func.n, nll_val, par)
         return nll_val
 
     def gradient(par):
@@ -124,10 +125,7 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     else:
         minuit = Minuit(func,start,name=name)
 
-    if use_chisq:
-      minuit.errordef=Minuit.LEAST_SQUARES
-    else:
-      minuit.errordef=Minuit.LIKELIHOOD
+    minuit.errordef=errordef
     minuit.errors = error
     minuit.limits = limit
 
@@ -147,9 +145,13 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     par_states = minuit.params
     f_min = minuit.fmin
     #print the nice tables of fit results
-    print(f_min)
-    print(par_states)
-    if f_min.is_valid: print(minuit.covariance.correlation())
+    if print_level >= 0:
+      print(f_min)
+      print(par_states)
+
+    if print_level >= 0:
+      if f_min.is_valid: 
+        print(minuit.covariance.correlation())
 
     results = {"params": {}}  # Get fit results and update parameters
     for n, p in enumerate(float_pars):
