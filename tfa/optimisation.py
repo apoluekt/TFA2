@@ -177,7 +177,8 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
     results["has_posdef_covar"] = int(f_min.has_posdef_covar)
     results["has_made_posdef_covar"] = int(f_min.has_made_posdef_covar)
     results["has_reached_call_limit"] = int(f_min.has_reached_call_limit)
-    if minuit.covariance is not None : results["covariance"] = minuit.covariance.to_table()
+    #if minuit.covariance is not None : results["covariance"] = minuit.covariance.to_table()
+    if minuit.covariance is not None : results["covariance"] = minuit.covariance.tolist()
     return results
 
 
