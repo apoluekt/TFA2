@@ -188,7 +188,8 @@ def calculate_fit_fractions(pdf, norm_sample):
     """
     import inspect
 
-    args, varargs, keywords, defaults = inspect.getargspec(pdf)
+    pdf_kwargs = inspect.getfullargspec(pdf)
+    args, defaults = pdf_kwargs.args, pdf_kwargs.defaults
     num_switches = 0
     if defaults:
         default_dict = dict(zip(args[-len(defaults) :], defaults))
