@@ -11,3 +11,5 @@ dependencies:
   - uproot
   - matplotlib
   - bioconda::snakemake==7.2.1
+  - uncertainties
+  - resample

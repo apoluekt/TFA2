@@ -230,9 +230,15 @@ def estimate_density(
             def nll() : 
                 return raw_nll() + regularisation(weights)
     else : 
-        @tf.function
-        def nll() : 
-            return raw_nll()
+        if regularisation is None : 
+            @tf.function
+            def nll() : 
+                return raw_nll()
+        else : 
+            @tf.function
+            def nll() : 
+                return raw_nll() + regularisation()
+
 
     # Training cycle
     best_cost = 1e10
