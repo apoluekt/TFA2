@@ -64,16 +64,16 @@ def set_lhcb_style(grid=True, size=10, usetex="auto", font="serif"):
 def label_title(title, units=None):
     label = title
     if units:
-        title += " (" + units + ")"
+        title += " [" + units + "]"
     return title
 
 
 def y_label_title(range, bins, units=None):
     binw = (range[1] - range[0]) / bins
     if units == None:
-        title = f"Entries/{binw}"
+        title = f"Entries / {binw}"
     else:
-        title = f"Entries/({binw:g} {units})"
+        title = f"Entries / ({binw:g} {units})"
     return title
 
 
@@ -147,7 +147,7 @@ def plot_distr2d(
         norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
     if log:
         if vmin <= 0.0:
-            vmin = 1.0
+            vmin = 0.3
         if vmax <= vmin:
             vmax = vmin
         norm = matplotlib.colors.LogNorm(vmin=vmin, vmax=vmax)
@@ -161,12 +161,13 @@ def plot_distr2d(
     zt = ztitle
     if not ztitle:
         zt = r"Entries"
+    jd = { zt : list(zip(((X[1:,1:]+X[:-1,:-1])/2.).flatten(), ((Y[1:,1:]+Y[:-1,:-1])/2.).flatten(), counts.flatten())) }
     if colorbar:
         cb = fig.colorbar(p, pad=0.01, ax=ax)
         cb.ax.set_ylabel(zt, ha="right", y=1.0)
         if log:
             cb.ax.set_yscale("log")
-    return (vmin, vmax)
+    return (vmin, vmax), jd
 
 
 def plot_distr1d(
@@ -199,12 +200,13 @@ def plot_distr1d(
       :param title:  plot title
       :param units:  2-element tuple of x axis and y axis units
     """
+    jd = {}
     if isinstance(weights, list):
         xarr = None
         for i, w in enumerate(weights):
             hist, edges = np.histogram(arr, bins=bins, range=range, weights=w)
+            left, right = edges[:-1], edges[1:]
             if xarr is None:
-                left, right = edges[:-1], edges[1:]
                 xarr = np.array([left, right]).T.flatten()
             dataarr = np.array([hist, hist]).T.flatten()
             if color:
@@ -216,15 +218,16 @@ def plot_distr1d(
             else:
                 lab = None
             ax.plot(xarr, dataarr, color=this_color, label=lab)
-            ax.fill_between(xarr, dataarr, 0.0, color=this_color, alpha=0.1)
+            jd[lab] = list(zip(0.5*(left+right), hist.astype(float)))
+            if fill : ax.fill_between(xarr, dataarr, 0.0, color=this_color, alpha=0.1)
     elif isinstance(arr, list):
         xarr = None
         for i, a in enumerate(arr):
             hist, edges = np.histogram(a, bins=bins, range=range, weights=weights)
             if normalise : 
                 hist = hist.astype(np.float64)*float(bins)/np.sum(hist)/(range[1]-range[0])
+            left, right = edges[:-1], edges[1:]
             if xarr is None:
-                left, right = edges[:-1], edges[1:]
                 if line : 
                     xarr = (left+right)/2.
                 else : 
@@ -242,6 +245,7 @@ def plot_distr1d(
             else:
                 lab = None
             ax.plot(xarr, dataarr, color=this_color, label=lab)
+            jd[lab] = list(zip(0.5*(left+right), hist.astype(float)))
             if fill : ax.fill_between(xarr, dataarr, 0.0, color=this_color, alpha=0.1)
     else:
         if color:
@@ -258,9 +262,11 @@ def plot_distr1d(
             ax.errorbar(
                 xarr, hist, np.sqrt(hist2), color=this_color, marker=".", linestyle=""
             )
+            jd[label] = list(zip(0.5*(left+right), hist.astype(float), np.sqrt(hist2)))
         else:
-            ax.plot(xarr, dataarr, color=this_color)
-            ax.fill_between(xarr, dataarr, 0.0, color=this_color, alpha=0.1)
+            ax.plot(xarr, dataarr, color=this_color, label = legend)
+            if fill : ax.fill_between(xarr, dataarr, 0.0, color=this_color, alpha=0.1)
+            jd[label] = list(zip(0.5*(left+right), hist.astype(float)))
     if not log:
         ax.set_ylim(bottom=0.0)
     else:
@@ -279,6 +285,7 @@ def plot_distr1d(
             legend_ax.axis("off")
         else:
             ax.legend(loc="best")
+    return jd
 
 
 def plot_distr1d_comparison(
@@ -470,7 +477,7 @@ class MultidimDisplay:
                     ax1 = axes[(n // (self.dim // 2)) + 1, 2 * (n % (self.dim // 2))]
                 else:
                     ax1 = axes[2 * (n // self.dim) + 1, n % self.dim]
-                self.zrange[(i, j)] = plot_distr2d(
+                self.zrange[(i, j)], _ = plot_distr2d(
                     data[:, i],
                     data[:, j],
                     bins=(bins[i], bins[j]),
