@@ -275,7 +275,7 @@ def estimate_density(
                     biases =  [b.numpy() for b in parameters[1]]
                     np.save(outfile, [ scale, transform_ranges, weights, biases] )
                 else : 
-                    np.save(outfile, [ scale, transform_ranges] + [p.numpy() for p in parameters() ] )
+                    np.save(outfile, [ scale, transform_ranges] + [p.numpy() for p in parameters ] )
                 f = open(outfile + ".txt", "w")
                 f.write(s + "\n")
                 f.close()
