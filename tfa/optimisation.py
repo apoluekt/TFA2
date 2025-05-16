@@ -150,7 +150,10 @@ def run_minuit(nll, pars, use_gradient=True, use_hesse = False, use_minos = Fals
         p.update(par_states[n].value)
         p.fitted_value = par_states[n].value
         p.error = par_states[n].error
-        results["params"][p.name] = (p.fitted_value, p.error)
+        if hasattr(par_states[n], 'merror') and par_states[n].merror is not None :
+          results["params"][p.name] = (p.fitted_value, p.error, par_states[n].merror[0], par_states[n].merror[1])
+        else : 
+          results["params"][p.name] = (p.fitted_value, p.error)
     for p in fixed_pars:
         results["params"][p.name] = (p.numpy(), 0.0)
 
