@@ -72,7 +72,8 @@ def run_toymc(pdf, phsp, size, maximum, chunk=200000, seed=None, components=True
         )
         return d, pdf(d)
 
-    args, varargs, keywords, defaults = inspect.getargspec(pdf)
+    pdf_kwargs = inspect.getfullargspec(pdf)
+    args, defaults = pdf_kwargs.args, pdf_kwargs.defaults
     num_switches = 0
     if defaults:
         default_dict = dict(zip(args[-len(defaults) :], defaults))
